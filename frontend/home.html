@@ -320,32 +320,57 @@
     }
 
     #recipes-container h2 {
-      color: #3E8440;
-      border-bottom: 2px solid #3E8440;
-      padding-bottom: 10px;
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 30px;
     }
 
     .recipe-card {
-      background-color: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      border-left: 6px solid #3E8440;
     }
 
+
     .recipe-card h3 {
+      font-size: 22px;
       color: #3E8440;
       margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .recipe-card p {
+      font-size: 16px;
+      color: #555;
+      margin-top: 0;
+      margin-bottom: 20px;
+      line-height: 1.6;
     }
 
     .recipe-card h4 {
+      font-size: 17px;
       color: #3E8440;
-      margin-bottom: 5px;
+      margin-top: 20px;
+      margin-bottom: 8px;
+      border-bottom: 1px dashed #B7E1A1;
+      padding-bottom: 5px;
     }
+
 
     .recipe-card ul {
       padding-left: 20px;
+      margin: 0;
     }
+
+    .recipe-card li {
+      font-size: 15px;
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+
 
     /* Loading indicator */
     .loading {
@@ -618,7 +643,7 @@
       }, 3000);
     }
 
-    // Find Recipes button handler
+    // ✅ Cleaned Find Recipes button handler
     document.querySelector(".find-recipes").addEventListener("click", async () => {
       try {
         document.querySelector(".find-recipes").innerHTML = "Finding Recipes... <span class='loading'></span>";
@@ -628,8 +653,8 @@
         document.querySelector(".find-recipes").innerHTML = "Find Recipes!";
 
         if (response.ok) {
-          const recipes = await response.json();
-          displayRecipes(recipes);
+          const recipeText = await response.text(); // Correctly parse as plain text
+          displayRecipes(recipeText);
           showStatus("Recipes generated successfully!", true);
         } else {
           showStatus("Could not find recipes with your ingredients.", false);
@@ -651,47 +676,64 @@
         return;
       }
 
-      // Split the recipes by the separator line
       const recipes = recipeText.split("<br><br>----<br><br>");
 
-      // Create recipe cards for each recipe
-      recipesList.innerHTML = recipes.map(recipe => {
-        // Clean up the recipe text
-        const cleanedRecipe = recipe.trim();
+      recipesList.innerHTML = recipes.map(raw => {
+        const cleaned = raw.replace(/^(<br\s*\/?>|\s)+/, "").trim();
 
-        // Create a styled recipe card
+        // Step 1: Match title (first line before <br><br>)
+        const titleMatch = cleaned.match(/^(.+?)<br><br>/);
+        const title = titleMatch ? titleMatch[1].trim() : "Recipe";
+
+        // Step 2: Match summary (next block after title)
+        const summaryMatch = cleaned.match(/^.+?<br><br>(.+?)<br><br>/s);
+        const summary = summaryMatch && summaryMatch[1].trim().length > 10
+          ? summaryMatch[1].trim()
+          : "This recipe combines your available ingredients in a creative way.";
+
+        // Step 3: Get everything after summary
+        const remaining = cleaned.split("<br><br>").slice(2).join("<br><br>");
+
+        // Step 4: Extract ingredients you have
+        const ingredientsHaveMatch = remaining.match(/Ingredients You Have:<br>(.*?)<br><br>/s);
+        const ingredientsHave = ingredientsHaveMatch
+          ? ingredientsHaveMatch[1]
+            .split("<br>")
+            .map(i => i.trim())
+            .filter(i => i.length > 1)
+            .map(i => `<li>${i.replace(/^\*/, "").trim()}</li>`)
+            .join("")
+          : "";
+
+        // Step 5: Extract ingredients needed
+        const ingredientsNeedMatch = remaining.match(/Additional Ingredients Needed:<br>(.*?)$/s);
+        const ingredientsNeed = ingredientsNeedMatch
+          ? ingredientsNeedMatch[1]
+            .split("<br>")
+            .map(i => i.trim())
+            .filter(i => i.length > 1)
+            .map(i => `<li>${i.replace(/^\*/, "").trim()}</li>`)
+            .join("")
+          : "";
+
         return `
       <div class="recipe-card">
-        ${cleanedRecipe}
+        <h3>${title}</h3>
+        <p>${summary}</p>
+        <div>
+          <h4>Ingredients You Have:</h4>
+          <ul>${ingredientsHave}</ul>
+        </div>
+        <div>
+          <h4>Additional Ingredients Needed:</h4>
+          <ul>${ingredientsNeed}</ul>
+        </div>
       </div>
     `;
       }).join("");
 
       recipesContainer.classList.remove("hidden");
     }
-
-    // Also update the Find Recipes button handler to handle plain text:
-    document.querySelector(".find-recipes").addEventListener("click", async () => {
-      try {
-        document.querySelector(".find-recipes").innerHTML = "Finding Recipes... <span class='loading'></span>";
-
-        const response = await fetch(`${API_BASE_URL}/recipes/${username}`);
-
-        document.querySelector(".find-recipes").innerHTML = "Find Recipes!";
-
-        if (response.ok) {
-          const recipeText = await response.text(); // Changed from json() to text()
-          displayRecipes(recipeText);
-          showStatus("Recipes generated successfully!", true);
-        } else {
-          showStatus("Could not find recipes with your ingredients.", false);
-        }
-      } catch (error) {
-        console.error("Error finding recipes:", error);
-        document.querySelector(".find-recipes").innerHTML = "Find Recipes!";
-        showStatus("Error connecting to recipe service.", false);
-      }
-    });
 
     // Function to display matches with contact information
     function displayMatches(matches) {
