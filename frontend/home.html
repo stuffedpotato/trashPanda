@@ -1,267 +1,771 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="./src/output.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Khula:wght@400;700&display=swap" rel="stylesheet">
+  <title>Trash Panda - Home</title>
+  <style>
+    /* Base styles */
+    body {
+      font-family: 'Khula', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #FDF6E3;
+      color: #333;
+    }
+
+    /* Header/Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #F2C1BD;
+      padding: 15px 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-icon {
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: bold;
+      color: #3E8440;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links li {
+      margin-left: 30px;
+    }
+
+    .nav-links a {
+      color: #3E8440;
+      text-decoration: none;
+      font-size: 20px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    /* Main content layout */
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section {
+      background-color: #FDF6E3;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #3E8440;
+      min-height: 250px;
+    }
+
+    .section h2 {
+      color: #3E8440;
+      font-size: 28px;
+      margin-top: 0;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #3E8440;
+      padding-bottom: 5px;
+    }
+
+    .want {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .have {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .map-container {
+      grid-column: span 2;
+      grid-row: 2;
+      min-height: 250px;
+    }
+
+    .buttons-container {
+      grid-column: span 2;
+      grid-row: 3;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 10px;
+    }
+
+    /* Buttons */
+    .btn {
+      background-color: #B7E1A1;
+      color: #3E8440;
+      padding: 12px 25px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      width: 200px;
+      text-align: center;
+    }
+
+    .btn:hover {
+      background-color: #3E8440;
+      color: white;
+    }
+
+    .createPostButton,
+    .createPostButton2 {
+      background-color: #B7E1A1;
+      color: #3E8440;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-weight: bold;
+      display: inline-block;
+      position: relative;
+      right: -15px;
+    }
+
+    .createPostButton:hover,
+    .createPostButton2:hover {
+      background-color: #3E8440;
+      color: white;
+    }
+
+    /* Lists */
+    #userList,
+    #userList2,
+    #matchResults {
+      list-style-type: none;
+      padding-left: 10px;
+      margin-top: 15px;
+    }
+
+    #userList li,
+    #userList2 li,
+    #matchResults li {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(62, 132, 64, 0.2);
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      overflow-y: auto;
+    }
+
+    .modal.visible {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 50px;
+    }
+
+    .modal-content,
+    .modal-content2 {
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 450px;
+      max-height: 80vh;
+      overflow-y: auto;
+      margin: 0 auto;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-content h2,
+    .modal-content2 h2 {
+      color: #3E8440;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #3E8440;
+      padding-bottom: 10px;
+    }
+
+    /* Form styling */
+    form label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #3E8440;
+    }
+
+    form input,
+    form select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    .modalBtn,
+    .modalBtn2 {
+      background-color: #3E8440;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 10px;
+      font-size: 16px;
+    }
+
+    .close-modal,
+    .close-modal2 {
+      background-color: #f44336;
+    }
+
+    /* Status message */
+    .status-message {
+      padding: 12px;
+      margin: 15px 0;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .status-success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .status-error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    /* Recipes container */
+    #recipes-container {
+      margin-top: 25px;
+      padding: 20px;
+      background-color: #FDF6E3;
+      border-radius: 10px;
+      border: 2px solid #3E8440;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #recipes-container h2 {
+      color: #3E8440;
+      border-bottom: 2px solid #3E8440;
+      padding-bottom: 10px;
+    }
+
+    .recipe-card {
+      background-color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .recipe-card h3 {
+      color: #3E8440;
+      margin-top: 0;
+    }
+
+    .recipe-card h4 {
+      color: #3E8440;
+      margin-bottom: 5px;
+    }
+
+    .recipe-card ul {
+      padding-left: 20px;
+    }
+
+    /* Loading indicator */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(62, 132, 64, 0.3);
+      border-radius: 50%;
+      border-top-color: #3E8440;
+      animation: spin 1s ease-in-out infinite;
+      margin-left: 10px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Utility classes */
+    .hidden {
+      display: none;
+    }
+
+    /* Media queries */
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .want,
+      .have {
+        grid-column: 1;
+      }
+
+      .have {
+        grid-row: 2;
+      }
+
+      .map-container {
+        grid-column: 1;
+        grid-row: 3;
+      }
+
+      .buttons-container {
+        grid-column: 1;
+        grid-row: 4;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .nav-links li {
+        margin-left: 15px;
+      }
+
+      .nav-links a {
+        font-size: 16px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <nav class="navbar">
-        <div class="logo-container">
-            <img src="./racoon_yellow.svg" alt="Raccoon Icon" class="logo-icon">
-            <span class="logo-text">Trash Panda</span>
-        </div>
-        <ul class="nav-links">
-            <li><a href="index.html">PROFILE</a></li>
-            <li><a href="home.html">HOME</a></li>
-
-        </ul>
-    </nav>
-    <div class="container">
-      <div class="section want">
-          <!-- <h2 style="color: #3E8440;">WANT</h2> -->
-          <div id="infoText">
-            <h2 style="color: #3E8440;">WANT</h2>
-            <ul id="userList" style="margin-left: 10px;">
-              <!-- User entries will appear here -->
-            </ul>
-          </div>
-          <button class = "createPostButton">Create new entry</button>
-      </div>
-        <div class="section have">
-            <!-- <h2 style="color: #3E8440;">HAVE</h2> -->
-            <!-- <div id="share-list-results"></div> -->
-            <div id="infoText">
-              <h2 style="color: #3E8440;">HAVE</h2>
-              <ul id="userList2" style="margin-left: 10px;">
-                <!-- User entries will appear here -->
-              </ul>
-            </div>
-            <button class = "createPostButton2">Create new entry</button>
-        </div>
-      <!-- <button class="btn find-recipes">Find Recipes!</button>
-      <button class="btn find-matches">Find Matches!</button> -->
-      <div class="map-container">
-          <!-- Map image -->
-          <!-- <img src="map.png" alt="Map with locations marked by stars"> -->
-          <h2 style="color: #3E8440;">NEAR YOU</h2>
-      </div>
-      <div class="buttons-container">
-        <button class="btn find-recipes">Find Recipes!</button>
-        <button class="btn find-matches">Find Matches!</button>
+  <nav class="navbar">
+    <div class="logo-container">
+      <img src="./racoon_yellow.svg" alt="Raccoon Icon" class="logo-icon">
+      <span class="logo-text">Trash Panda</span>
     </div>
-</div>
-<!-- <button class = "createPostButton">Create new entry</button> -->
+    <ul class="nav-links">
+      <li><a href="index.html">PROFILE</a></li>
+      <li><a href="home.html">HOME</a></li>
+      <li><a href="community.html">COMMUNITY</a></li>
+    </ul>
+  </nav>
 
-<div id="createPostModal" class="modal hidden">
-    <div class="modal-content">
-      <h2>Create New Post</h2>
-      <form id="postForm">
-        <label for="foodName">Food Name:</label>
-        <input type="text" id="foodName" name="foodName" required><br><br>
-  
-        <label for="expiryDate">Expiry Date:</label>
-        <input type="date" id="expiryDate" name="expiryDate" required><br><br>
-  
-        <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" name="quantity" min="1" required><br><br>
-  
-        <button type="submit" class="modalBtn">Submit</button>
-        <button type="button" class="modalBtn close-modal">Cancel</button>
-      </form>
+  <div class="container">
+    <div class="section want">
+      <h2>WANT</h2>
+      <ul id="userList">
+        <li>Loading...</li>
+      </ul>
+      <button class="createPostButton">Create new entry</button>
     </div>
+    <div class="section have">
+      <h2>HAVE</h2>
+      <ul id="userList2">
+        <li>Loading...</li>
+      </ul>
+      <button class="createPostButton2">Create new entry</button>
+    </div>
+    <div class="section map-container">
+      <h2>NEAR YOU</h2>
+      <ul id="matchResults"></ul>
+    </div>
+    <div class="buttons-container">
+      <button class="btn find-recipes">Find Recipes!</button>
+      <button class="btn find-matches">Find Matches!</button>
+    </div>
+    <div id="status-container" class="hidden status-message"></div>
   </div>
 
+  <div id="recipes-container" class="hidden">
+    <h2>RECIPES</h2>
+    <div id="recipes-list"></div>
+  </div>
+
+  <!-- Share Modal -->
   <div id="createPostModal2" class="modal hidden">
     <div class="modal-content2">
-      <h2>Create New Post</h2>
+      <h2>Create New Share Entry</h2>
       <form id="postForm2">
-        <label for="foodName">Food Name:</label>
-        <input type="text" id="foodName2" name="foodName" required><br><br>
-  
-        <label for="expiryDate">Expiry Date:</label>
-        <input type="date" id="expiryDate2" name="expiryDate" required><br><br>
-  
-        <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity2" name="quantity" min="1" required><br><br>
-  
+        <label for="foodName2">Food Name:</label>
+        <input type="text" id="foodName2" name="foodName" required>
+
+        <label for="expiryDate2">Expiry Date:</label>
+        <input type="date" id="expiryDate2" name="expiryDate" required>
+
+        <label for="quantity2">Quantity:</label>
+        <input type="number" id="quantity2" name="quantity" min="1" required>
+
+        <label for="units2">Units:</label>
+        <select id="units2" name="units">
+          <option value="UNIT">Units</option>
+          <option value="TSP">Teaspoon</option>
+          <option value="TBSP">Tablespoon</option>
+          <option value="CUP">Cup</option>
+          <option value="G">Grams</option>
+          <option value="KG">Kilograms</option>
+          <option value="L">Liters</option>
+          <option value="ML">Milliliters</option>
+          <option value="SLICES">Slices</option>
+        </select>
+
         <button type="submit" class="modalBtn2">Submit</button>
         <button type="button" class="modalBtn close-modal2">Cancel</button>
       </form>
     </div>
   </div>
 
-    <script>
-        async function getShareList() {
-            const username = localStorage.getItem('username');
+  <!-- Want Modal -->
+  <div id="createPostModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Create New Want Entry</h2>
+      <form id="postForm">
+        <label for="foodName">Food Name:</label>
+        <input type="text" id="foodName" name="foodName" required>
 
-            if (username) {
-                console.log('Logged-in user:', username);
-            } else {
-                console.log('No user logged in');
-            }
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="1" value="1" required>
 
-            const resultsDiv = document.getElementById('share-list-results');
+        <label for="units">Units:</label>
+        <select id="units" name="units">
+          <option value="UNIT">Units</option>
+          <option value="TSP">Teaspoon</option>
+          <option value="TBSP">Tablespoon</option>
+          <option value="CUP">Cup</option>
+          <option value="G">Grams</option>
+          <option value="KG">Kilograms</option>
+          <option value="L">Liters</option>
+          <option value="ML">Milliliters</option>
+          <option value="SLICES">Slices</option>
+        </select>
 
-            if (!username) {
-                resultsDiv.innerHTML = '<p>Please enter a username.</p>';
-                return;
-            }
+        <button type="submit" class="modalBtn">Submit</button>
+        <button type="button" class="modalBtn close-modal">Cancel</button>
+      </form>
+    </div>
+  </div>
 
-            try {
-                const response = await fetch(`http://localhost:4567/sharelist/${username}`);
-                if (!response.ok) throw new Error("Failed to fetch share list");
+  <script>
+    // Get the current username from localStorage
+    const username = localStorage.getItem("username") || "christine";
 
-                const data = await response.json();
+    // API base URL
+    const API_BASE_URL = "http://localhost:4567";
 
-                if (data.length === 0) {
-                    resultsDiv.innerHTML = "<p>No items found.</p>";
-                    return;
-                }
+    // Load user's sharelist and wantlist when page loads
+    document.addEventListener("DOMContentLoaded", function () {
+      console.log("Loading data for user:", username);
+      loadLists();
+    });
 
-                resultsDiv.innerHTML = `
-        <ul style="list-style-type: none; padding-left: 0;">
-          ${data.map(entry => `
-            <li style="margin-bottom: 8px;">
-              <strong>${entry.item.name}</strong> – ${entry.qty} ${entry.item.qtyType}
-              ${entry.expirationDate ? `(Expires: ${entry.expirationDate})` : ""}
-            </li>
-          `).join("")}
-        </ul>
-      `;
-            } catch (error) {
-                console.error(error);
-                resultsDiv.innerHTML = '<p>Error fetching data.</p>';
-            }
+    async function loadLists() {
+      try {
+        console.log("Loading lists for user:", username);
+
+        // Fetch sharelist data
+        const shareResponse = await fetch(`${API_BASE_URL}/sharelist/${username}`);
+        let shareList = [];
+        if (shareResponse.ok) {
+          shareList = await shareResponse.json();
+          console.log("ShareList loaded:", shareList);
+        } else {
+          console.log("No sharelist found, status:", shareResponse.status);
         }
 
-        getShareList();
+        // Fetch wantlist data
+        const wantResponse = await fetch(`${API_BASE_URL}/wantlist/${username}`);
+        let wantList = [];
+        if (wantResponse.ok) {
+          wantList = await wantResponse.json();
+          console.log("WantList loaded:", wantList);
+        } else {
+          console.log("No wantlist found, status:", wantResponse.status);
+        }
 
-        const createPostButton = document.querySelector('.createPostButton');
-        const modal = document.querySelector('#createPostModal');
-        const closeModalButtons = document.querySelectorAll('.close-modal');
+        // Update UI
+        displayShareList(shareList);
+        displayWantList(wantList);
+      } catch (error) {
+        console.error("Error loading lists:", error);
+      }
+    }
 
-        // Show modal when "Create new post" button is clicked
-        createPostButton.addEventListener('click', () => {
-        modal.classList.remove('hidden');
+    function displayShareList(shareList) {
+      const shareListElement = document.getElementById("userList2");
+
+      if (!shareList || shareList.length === 0) {
+        shareListElement.innerHTML = "<li>No items in your share list</li>";
+        return;
+      }
+
+      shareListElement.innerHTML = shareList.map(item => {
+        const itemName = item.item ? item.item.name : "Unknown item";
+        const qty = item.qty || 0;
+        const unit = (item.item && item.item.qtyType) ? item.item.qtyType.toLowerCase() : "units";
+        const date = item.expirationDate ? new Date(item.expirationDate).toLocaleDateString() : "No expiry";
+
+        return `<li>${itemName} - ${qty} ${unit} (Expires: ${date})</li>`;
+      }).join("");
+    }
+
+    function displayWantList(wantList) {
+      const wantListElement = document.getElementById("userList");
+
+      if (!wantList || wantList.length === 0) {
+        wantListElement.innerHTML = "<li>No items in your want list</li>";
+        return;
+      }
+
+      wantListElement.innerHTML = wantList.map(item => {
+        const itemName = item.item ? item.item.name : "Unknown item";
+        const qty = item.qty || 1;
+        const unit = (item.item && item.item.qtyType) ? item.item.qtyType.toLowerCase() : "units";
+
+        return `<li>${itemName} - ${qty} ${unit}</li>`;
+      }).join("");
+    }
+
+    function showStatus(message, isSuccess) {
+      const statusContainer = document.getElementById("status-container");
+      statusContainer.textContent = message;
+      statusContainer.className = isSuccess ? "status-message status-success" : "status-message status-error";
+      statusContainer.classList.remove("hidden");
+
+      // Hide status after 3 seconds
+      setTimeout(() => {
+        statusContainer.classList.add("hidden");
+      }, 3000);
+    }
+
+    // Find Recipes button handler
+    document.querySelector(".find-recipes").addEventListener("click", async () => {
+      try {
+        document.querySelector(".find-recipes").innerHTML = "Finding Recipes... <span class='loading'></span>";
+
+        const response = await fetch(`${API_BASE_URL}/recipes/${username}`);
+
+        document.querySelector(".find-recipes").innerHTML = "Find Recipes!";
+
+        if (response.ok) {
+          const recipes = await response.json();
+          displayRecipes(recipes);
+          showStatus("Recipes generated successfully!", true);
+        } else {
+          showStatus("Could not find recipes with your ingredients.", false);
+        }
+      } catch (error) {
+        console.error("Error finding recipes:", error);
+        document.querySelector(".find-recipes").innerHTML = "Find Recipes!";
+        showStatus("Error connecting to recipe service.", false);
+      }
+    });
+
+    function displayRecipes(recipes) {
+      const recipesContainer = document.getElementById("recipes-container");
+      const recipesList = document.getElementById("recipes-list");
+
+      if (!recipes || recipes.length === 0) {
+        recipesList.innerHTML = "<p>No recipes found with your current ingredients.</p>";
+        recipesContainer.classList.remove("hidden");
+        return;
+      }
+
+      recipesList.innerHTML = recipes.map(recipe => {
+        return `
+            <div class="recipe-card">
+              <h3>${recipe.title}</h3>
+              <p>${recipe.summary}</p>
+              <h4>Ingredients You Have:</h4>
+              <ul>
+                ${recipe.usedIngredients.map(ingredient => `<li>${ingredient}</li>`).join("")}
+              </ul>
+              <h4>Additional Ingredients Needed:</h4>
+              <ul>
+                ${recipe.neededIngredients.map(ingredient => `<li>${ingredient}</li>`).join("")}
+              </ul>
+            </div>
+          `;
+      }).join("");
+
+      recipesContainer.classList.remove("hidden");
+    }
+
+    // Find Matches button handler
+    document.querySelector(".find-matches").addEventListener("click", async () => {
+      try {
+        document.querySelector(".find-matches").innerHTML = "Finding Matches... <span class='loading'></span>";
+        document.getElementById("matchResults").innerHTML = "<li>Searching for matches...</li>";
+
+        const response = await fetch(`${API_BASE_URL}/matches/${username}`);
+
+        document.querySelector(".find-matches").innerHTML = "Find Matches!";
+
+        if (response.ok) {
+          const matches = await response.json();
+
+          // Display matches in the UI
+          const matchResultsElement = document.getElementById("matchResults");
+          if (matches.length === 0) {
+            matchResultsElement.innerHTML = "<li>No matches found in your area.</li>";
+          } else {
+            matchResultsElement.innerHTML = matches.map(m =>
+              `<li>${m.user.firstName || m.user.userName} (${m.distance.toFixed(1)} km away)</li>`
+            ).join("");
+            showStatus("Found matches in your area!", true);
+          }
+        } else {
+          document.getElementById("matchResults").innerHTML = "<li>No matches found in your area.</li>";
+        }
+      } catch (error) {
+        console.error("Error finding matches:", error);
+        document.querySelector(".find-matches").innerHTML = "Find Matches!";
+        document.getElementById("matchResults").innerHTML = "<li>Error connecting to match service.</li>";
+        showStatus("Error finding matches.", false);
+      }
+    });
+
+    // Modal handlers
+    document.querySelector(".createPostButton").addEventListener("click", () => {
+      document.getElementById("createPostModal").classList.remove("hidden");
+      document.getElementById("createPostModal").classList.add("visible");
+    });
+
+    document.querySelector(".close-modal").addEventListener("click", () => {
+      document.getElementById("createPostModal").classList.remove("visible");
+      document.getElementById("createPostModal").classList.add("hidden");
+    });
+
+    document.querySelector(".createPostButton2").addEventListener("click", () => {
+      document.getElementById("createPostModal2").classList.remove("hidden");
+      document.getElementById("createPostModal2").classList.add("visible");
+    });
+
+    document.querySelector(".close-modal2").addEventListener("click", () => {
+      document.getElementById("createPostModal2").classList.remove("visible");
+      document.getElementById("createPostModal2").classList.add("hidden");
+    });
+
+    // Handle want list form submission
+    document.getElementById("postForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const item = document.getElementById("foodName").value;
+      const qty = parseFloat(document.getElementById("quantity").value);
+      const qtyType = document.getElementById("units").value;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/wantlist`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: username,
+            item: {
+              name: item,
+              qtyType: qtyType
+            },
+            qty: qty
+          })
         });
 
-        // Hide modal when "Cancel" button or outside modal is clicked
-        closeModalButtons.forEach(button => {
-        button.addEventListener('click', () => {  // Change this line to use button instead of createPostButton
-            modal.classList.add('hidden');
-        });
-        });
+        if (response.ok) {
+          // Use the old way of hiding the modal
+          document.getElementById("createPostModal").classList.remove("visible");
+          document.getElementById("createPostModal").classList.add("hidden");
+          document.getElementById("foodName").value = "";
+          document.getElementById("quantity").value = "1";
+          document.getElementById("units").value = "UNIT";
 
-        // Prevent form from refreshing the page on submit
-        document.getElementById('postForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        // alert("New post created!"); // Handle form submission here'
-        // const foodName = document.getElementById("foodName");
-        // const food = foodName.value;
-        // const expiryDate = document.getElementById("expiryDate").value;
-        // const date = expiryDate.value;
-        // const quantity = document.getElementById("quantity").value;
-        // const quant = quantity.value;
-        // const newListItem = document.createElement('li');
-        // newListItem.textContent = `${food}, ${date}, ${quant}`;
+          // Show success message
+          showStatus(`Added ${item} to your want list!`, true);
 
- // Create a new list item with food details
- const newListItem = document.createElement('li');
-    
-    // Create a sublist for each food entry with its details
-    const sublist = document.createElement('ul');
+          // Reload lists
+          loadLists();
+        } else {
+          showStatus("Failed to add item to want list", false);
+        }
+      } catch (error) {
+        console.error("Error adding to want list:", error);
+        showStatus("Error connecting to the server", false);
+      }
+    });
 
-    // Add list items for food name, expiry date, and quantity
-    const foodNameItem = document.createElement('li');
-    foodNameItem.textContent = `${foodName.value}`;
-    
-    const expiryDateItem = document.createElement('li');
-    expiryDateItem.textContent = `Expiry Date: ${expiryDate.value}`;
+    // Handle share list form submission - similarly updated
+    document.getElementById("postForm2").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const item = document.getElementById("foodName2").value;
+      const qty = parseFloat(document.getElementById("quantity2").value);
+      const qtyType = document.getElementById("units2").value;
+      const expirationDate = document.getElementById("expiryDate2").value;
 
-    const quantityItem = document.createElement('li');
-    quantityItem.textContent = `Amount: ${quantity.value}`;
-
-    // Append the details to the sublist
-    sublist.appendChild(foodNameItem);
-    sublist.appendChild(expiryDateItem);
-    sublist.appendChild(quantityItem);
-
-    // Append the sublist to the new list item
-    newListItem.appendChild(sublist);
-
-        // Append the new list item to the list
-        userList.appendChild(newListItem);
-        modal.classList.add('hidden');
+      try {
+        const response = await fetch(`${API_BASE_URL}/sharelist`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: username,
+            item: {
+              name: item,
+              qtyType: qtyType
+            },
+            qty: qty,
+            expirationDate: expirationDate
+          })
         });
 
-        const createPostButton2 = document.querySelector('.createPostButton2');
-        const modal2 = document.querySelector('#createPostModal2');
-        const closeModalButtons2 = document.querySelectorAll('.close-modal2');
+        if (response.ok) {
+          // Use the old way of hiding the modal
+          document.getElementById("createPostModal2").classList.remove("visible");
+          document.getElementById("createPostModal2").classList.add("hidden");
+          document.getElementById("foodName2").value = "";
+          document.getElementById("quantity2").value = "";
+          document.getElementById("expiryDate2").value = "";
+          document.getElementById("units2").value = "UNIT";
 
-        // Show modal when "Create new post" button is clicked
-        createPostButton2.addEventListener('click', () => {
-        modal2.classList.remove('hidden');
-        });
+          // Show success message
+          showStatus(`Added ${item} to your share list!`, true);
 
-        // Hide modal when "Cancel" button or outside modal is clicked
-        closeModalButtons2.forEach(button => {
-        button.addEventListener('click', () => {  // Change this line to use button instead of createPostButton
-            modal2.classList.add('hidden');
-        });
-        });
-
-        // Prevent form from refreshing the page on submit
-        document.getElementById('postForm2').addEventListener('submit', (e2) => {
-        e2.preventDefault();
-        // alert("New post created!"); // Handle form submission here'
-        // const foodName = document.getElementById("foodName");
-        // const food = foodName.value;
-        // const expiryDate = document.getElementById("expiryDate").value;
-        // const date = expiryDate.value;
-        // const quantity = document.getElementById("quantity").value;
-        // const quant = quantity.value;
-        // const newListItem = document.createElement('li');
-        // newListItem.textContent = `${food}, ${date}, ${quant}`;
-
- // Create a new list item with food details
- const newListItem2 = document.createElement('li');
-    
-    // Create a sublist for each food entry with its details
-    const sublist2 = document.createElement('ul');
-
-    // Add list items for food name, expiry date, and quantity
-    const foodNameItem2 = document.createElement('li');
-    foodNameItem2.textContent = `${foodName2.value}`;
-    
-    const expiryDateItem2 = document.createElement('li');
-    expiryDateItem2.textContent = `Expiry Date: ${expiryDate2.value}`;
-
-    const quantityItem2 = document.createElement('li');
-    quantityItem2.textContent = `Amount: ${quantity2.value}`;
-
-    // Append the details to the sublist
-    sublist2.appendChild(foodNameItem2);
-    sublist2.appendChild(expiryDateItem2);
-    sublist2.appendChild(quantityItem2);
-
-    // Append the sublist to the new list item
-    newListItem2.appendChild(sublist2);
-
-        // Append the new list item to the list
-        userList2.appendChild(newListItem2);
-        modal2.classList.add('hidden');
-        });
-
-
-
-
-
-
-    </script>
-
-
+          // Reload lists
+          loadLists();
+        } else {
+          showStatus("Failed to add item to share list", false);
+        }
+      } catch (error) {
+        console.error("Error adding to share list:", error);
+        showStatus("Error connecting to the server", false);
+      }
+    });
+  </script>
 </body>
-</html>
 
+</html>

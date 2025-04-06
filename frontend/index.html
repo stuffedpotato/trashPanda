@@ -1,19 +1,191 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Select Location</title>
+  <title>Trash Panda - Profile</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link href="./src/output.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Khula:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    #map { height: 500px; }
+    /* Base styles */
+    body {
+      font-family: 'Khula', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #FDF6E3;
+      color: #333;
+    }
+    
+    /* Header/Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #F2C1BD;
+      padding: 15px 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo-icon {
+      height: 40px;
+      margin-right: 10px;
+    }
+    
+    .logo-text {
+      font-size: 24px;
+      font-weight: bold;
+      color: #3E8440;
+    }
+    
+    .nav-links {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .nav-links li {
+      margin-left: 30px;
+    }
+    
+    .nav-links a {
+      color: #3E8440;
+      text-decoration: none;
+      font-size: 20px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    /* Map and Form Container */
+    .profile-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    @media (min-width: 768px) {
+      .profile-container {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+      }
+    }
+    
+    #map {
+      height: 500px;
+      border-radius: 10px;
+      border: 2px solid #3E8440;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      grid-column: 1;
+      grid-row: 1;
+    }
+    
+    .form-container {
+      background-color: #FDF6E3;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #3E8440;
+      grid-column: 1;
+      grid-row: 2;
+    }
+    
+    @media (min-width: 768px) {
+      .form-container {
+        grid-column: 2;
+        grid-row: 1;
+      }
+    }
+    
+    /* Form styles */
+    .form-container h2 {
+      color: #3E8440;
+      margin-top: 0;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #3E8440;
+      padding-bottom: 10px;
+    }
+    
+    .form-container label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      color: #3E8440;
+      font-weight: bold;
+    }
+    
+    .form-container input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    
+    .form-container button {
+      background-color: #3E8440;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    
+    .form-container button:hover {
+      background-color: #2a5c2d;
+    }
+    
+    /* Summary styles */
+    .summary {
+      background-color: #FDF6E3;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #3E8440;
+      margin-top: 20px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .summary h2 {
+      color: #3E8440;
+      margin-top: 0;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #3E8440;
+      padding-bottom: 10px;
+      text-align: center;
+    }
+    
+    .summary p {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(62, 132, 64, 0.2);
+    }
+    
+    .summary strong {
+      color: #3E8440;
+    }
+    
+    /* Utility classes */
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
-
     <nav class="navbar">
         <div class="logo-container">
             <img src="./racoon_yellow.svg" alt="Raccoon Icon" class="logo-icon">
@@ -22,95 +194,110 @@
         <ul class="nav-links">
             <li><a href="index.html">PROFILE</a></li>
             <li><a href="home.html">HOME</a></li>
+            <li><a href="community.html">COMMUNITY</a></li>
         </ul>
     </nav>
 
-<!-- <h3 style = "margin-left: 20px;" >Select Your Location</h3> -->
-<div class="profile-container">
-    <!-- Map Section -->
-    <div id="map"></div>
-  
-    <!-- Form Section -->
-    <div class="form-container">
-      <label for="name">Name:</label>
-      <input type="text" id="name" placeholder="Enter your name">
+    <div class="profile-container">
+        <!-- Map Section -->
+        <div id="map"></div>
       
-      <label for="contact">Contact Information:</label>
-      <input type="text" id="contact" placeholder="Enter your contact information">
-  
-      <label for="radius">Search Radius:</label>
-      <input type="text" id="radius" placeholder="Enter your desired search radius"></input>
+        <!-- Form Section -->
+        <div class="form-container">
+          <h2>Create Your Profile</h2>
+          <label for="name">Username:</label>
+          <input type="text" id="name" placeholder="Enter your username">
+          
+          <label for="contact">Contact Information:</label>
+          <input type="text" id="contact" placeholder="Enter your contact information">
       
-      <button onclick="submitForm()">Create Account</button>
+          <label for="radius">Search Radius (km):</label>
+          <input type="number" id="radius" placeholder="Enter your desired search radius" min="1" max="50">
+          
+          <button onclick="submitForm()">Create Account</button>
+        </div>
     </div>
-</div>
 
-<div id="summary" class="hidden"></div>
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-  // Initialize the map
-  const map = L.map('map').setView([20, 0], 2); // Default world view
-
-  // Add OpenStreetMap tiles
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
-
-  let marker;
-
-  // Handle clicks on the map to add markers
-  map.on('click', function(e) {
-    const lat = e.latlng.lat.toFixed(5);
-    const lng = e.latlng.lng.toFixed(5);
-    console.log(`Selected Location: Lat: ${lat}, Lng: ${lng}`);
-
-    if (marker) {
-      marker.setLatLng(e.latlng);
-    } else {
-      marker = L.marker(e.latlng).addTo(map);
-    }
-  });
-
-  function login() {
-      const username = document.getElementById('name').value;
-
-      localStorage.setItem('username', username);
-
-      alert('Logged in as ' + username);
-
-      window.location.reload();
-  }
-
-  // Function to handle form submission
-  function submitForm() {
-      login();
-    const name = document.getElementById('name').value;
-    const contact = document.getElementById('contact').value;
-    const radius = document.getElementById('radius').value;
-
-    console.log('Form Data: ', { name, contact, radius });
-    document.getElementById('map').classList.add('hidden');
-    document.querySelector('.form-container').classList.add('hidden');
-
+    <div id="summary" class="hidden"></div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+      // Initialize the map
+      const map = L.map('map').setView([49.2827, -123.1207], 11); // Default to Vancouver
+    
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+    
+      let marker;
+      let selectedLat = 49.2827;
+      let selectedLng = -123.1207;
+      
+      // Set default marker
+      marker = L.marker([selectedLat, selectedLng]).addTo(map);
+    
+      // Handle clicks on the map to add markers
+      map.on('click', function(e) {
+        selectedLat = e.latlng.lat.toFixed(5);
+        selectedLng = e.latlng.lng.toFixed(5);
+        console.log(`Selected Location: Lat: ${selectedLat}, Lng: ${selectedLng}`);
+    
+        if (marker) {
+          marker.setLatLng(e.latlng);
+        } else {
+          marker = L.marker(e.latlng).addTo(map);
+        }
+      });
+    
+      function login() {
+        const username = document.getElementById('name').value;
+        
+        if (!username) {
+          alert('Please enter a username');
+          return false;
+        }
+    
+        localStorage.setItem('username', username);
+        console.log('Logged in as ' + username);
+        return true;
+      }
+    
+      // Function to handle form submission
+      function submitForm() {
+        if (!login()) return;
+        
+        const name = document.getElementById('name').value;
+        const contact = document.getElementById('contact').value;
+        const radius = document.getElementById('radius').value || 10;
+    
+        console.log('Form Data: ', { name, contact, radius, lat: selectedLat, lng: selectedLng });
+        
+        document.getElementById('map').classList.add('hidden');
+        document.querySelector('.form-container').classList.add('hidden');
+    
         // Prepare the summary HTML
         const summaryHtml = `
-      <div class="summary">
-        <h2>Account Information</h2>
-        <br>
-        <p><strong>Name:</strong> ${name}</p>
-        <br>
-        <p><strong>Contact:</strong> ${contact}</p>
-        <br>
-        <p><strong>Search Radius:</strong> ${radius}</p>
-      </div>
-    `;
-
-    // Set the summary content and show it
-    document.getElementById('summary').innerHTML = summaryHtml;
-    document.getElementById('summary').classList.remove('hidden');
-  }
-</script>
-
+          <div class="summary">
+            <h2>Account Information</h2>
+            <p><strong>Username:</strong> ${name}</p>
+            <p><strong>Contact:</strong> ${contact}</p>
+            <p><strong>Search Radius:</strong> ${radius} km</p>
+            <p><strong>Location:</strong> Latitude: ${selectedLat}, Longitude: ${selectedLng}</p>
+            <p class="success-message" style="color: #3E8440; text-align: center; margin-top: 20px; font-weight: bold;">
+              Account created successfully! You can now access <a href="home.html" style="color: #3E8440;">Home</a> to start sharing items.
+            </p>
+          </div>
+        `;
+    
+        // Set the summary content and show it
+        document.getElementById('summary').innerHTML = summaryHtml;
+        document.getElementById('summary').classList.remove('hidden');
+        
+        // In a real application, you would send this data to your backend
+        // to create a new user profile
+      }
+    </script>
 </body>
 </html>
