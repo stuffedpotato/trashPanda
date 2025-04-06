@@ -1,5 +1,7 @@
 package com.trashpanda;
 import com.trashpanda.ShareList.ShareListEntry;
+import com.trashpanda.WantList.WantListEntry;
+
 import java.util.*;
 
 public class User {

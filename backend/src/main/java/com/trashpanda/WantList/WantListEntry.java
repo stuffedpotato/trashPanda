@@ -1,4 +1,6 @@
-package com.trashpanda;
+package com.trashpanda.WantList;
+
+import com.trashpanda.Item;
 
 public class WantListEntry {
     private String userName;
