@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="./src/output.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Khula:wght@400;700&display=swap" rel="stylesheet">
+  
 </head>
 <body>
     <nav class="navbar">
@@ -18,10 +20,55 @@
         </ul>
     </nav>
 
-    <button class = "btn">Create new post</button>
+    <button class = "createPostButton">Create new post</button>
     <div class = "post-container">
         <p>Community information placeholder</p>
     </div>
     <button class = "btn">Respond!</button>
+
+    <div id="createPostModal" class="modal hidden">
+        <div class="modal-content">
+          <h2>Create New Post</h2>
+          <form id="postForm">
+            <label for="foodName">Food Name:</label>
+            <input type="text" id="foodName" name="foodName" required><br><br>
+      
+            <label for="expiryDate">Expiry Date:</label>
+            <input type="date" id="expiryDate" name="expiryDate" required><br><br>
+      
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" min="1" required><br><br>
+      
+            <button type="submit" class="modalBtn">Submit</button>
+            <button type="button" class="modalBtn close-modal">Cancel</button>
+          </form>
+        </div>
+      </div>
+
+      <script>
+        const createPostButton = document.querySelector('.createPostButton');
+        const modal = document.querySelector('#createPostModal');
+        const closeModalButtons = document.querySelectorAll('.close-modal');
+
+        // Show modal when "Create new post" button is clicked
+        createPostButton.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        });
+
+        // Hide modal when "Cancel" button or outside modal is clicked
+        closeModalButtons.forEach(button => {
+        button.addEventListener('click', () => {  // Change this line to use button instead of createPostButton
+            modal.classList.add('hidden');
+        });
+        });
+
+        // Prevent form from refreshing the page on submit
+        document.getElementById('postForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert("New post created!"); // Handle form submission here
+        modal.classList.add('hidden');
+        });
+
+      </script>
 </body>
 </html>
