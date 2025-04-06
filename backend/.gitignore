@@ -2,3 +2,4 @@
 
 # Secrets
 .env
+**/.env
