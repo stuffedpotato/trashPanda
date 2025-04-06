@@ -8,6 +8,7 @@ package com.trashpanda;
     PRODUCE,
     FRUIT,
     VEGETABLE,
+    GRAIN,
     DAIRY,
     MEAT,
     FISH,
