@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+body {
+    margin: 0;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f4b5af; /* Pink background */
+    padding: 10px 20px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-icon {
+    width: 40px; /* Adjust size as needed */
+}
+
+.logo-text {
+    font-family: Arial, sans-serif; /* Adjust font as needed */
+    color: #6e8c3b; /* Green text color */
+}
+
+.nav-links {
+    list-style-type: none;
+}
+
+.nav-links li {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #6e8c3b; /* Green text color */
+    font-family: Arial, sans-serif; /* Adjust font as needed */
+}
