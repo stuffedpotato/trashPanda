@@ -2,10 +2,13 @@ com/trashpanda/ItemCategory.class
 com/trashpanda/ShareList/ShareListController.class
 com/trashpanda/DatabaseConfig.class
 com/trashpanda/WantList/WantListService.class
+com/trashpanda/ShareList/ShareListService$1.class
 com/trashpanda/Matchmaker.class
+com/trashpanda/WantList/WantListService$1.class
 com/trashpanda/User.class
 com/trashpanda/Main.class
 com/trashpanda/Main$ErrorResponse.class
+com/trashpanda/LocationController.class
 com/trashpanda/Item.class
 com/trashpanda/ShareList/ShareListService.class
 com/trashpanda/RecipeGenerator.class

@@ -2,8 +2,10 @@ package com.trashpanda;
 
 import com.trashpanda.ShareList.ShareListEntry;
 import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
 
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -80,6 +82,17 @@ public class RecipeGenerator {
                 os.write(input, 0, input.length);
             }
 
+            // Check response code
+            int responseCode = conn.getResponseCode();
+            if (responseCode != 200) {
+                Scanner errorScanner = new Scanner(conn.getErrorStream());
+                StringBuilder errorResponse = new StringBuilder();
+                while (errorScanner.hasNextLine()) {
+                    errorResponse.append(errorScanner.nextLine());
+                }
+                return "API Error: " + responseCode + " - " + errorResponse.toString();
+            }
+
             Scanner scanner = new Scanner(conn.getInputStream());
             StringBuilder response = new StringBuilder();
 
@@ -91,32 +104,78 @@ public class RecipeGenerator {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "Failed to generate recipes.";
+            return "Failed to generate recipes: " + e.getMessage();
         }
     }
 
     private static String parseGeminiResponse(String rawJson) {
-        JsonObject root = JsonParser.parseString(rawJson).getAsJsonObject();
-        JsonArray candidates = root.getAsJsonArray("candidates");
-    
-        if (candidates != null && candidates.size() > 0) {
-            JsonObject content = candidates.get(0).getAsJsonObject().getAsJsonObject("content");
-            JsonArray parts = content.getAsJsonArray("parts");
-    
-            if (parts != null && parts.size() > 0) {
-                // 👇 This is the actual JSON-formatted recipe array (as a string)
-                String jsonText = parts.get(0).getAsJsonObject().get("text").getAsString();
-    
-                try {
-                    JsonArray recipeArray = JsonParser.parseString(jsonText).getAsJsonArray();
-                    return new GsonBuilder().setPrettyPrinting().create().toJson(recipeArray);
-                } catch (JsonSyntaxException e) {
-                    e.printStackTrace();
-                    return "Gemini returned malformed JSON.";
+        try {
+            // Create a Gson instance with lenient parsing
+            Gson gson = new GsonBuilder().setLenient().create();
+            
+            // Parse the main response
+            JsonObject root = gson.fromJson(rawJson, JsonObject.class);
+            JsonArray candidates = root.getAsJsonArray("candidates");
+        
+            if (candidates != null && candidates.size() > 0) {
+                JsonObject content = candidates.get(0).getAsJsonObject().getAsJsonObject("content");
+                JsonArray parts = content.getAsJsonArray("parts");
+        
+                if (parts != null && parts.size() > 0) {
+                    // Get the text content which should contain the recipes JSON
+                    String jsonText = parts.get(0).getAsJsonObject().get("text").getAsString();
+        
+                    try {
+                        // Use lenient parsing for the recipe JSON
+                        JsonReader reader = new JsonReader(new StringReader(jsonText));
+                        reader.setLenient(true);
+                        JsonArray recipeArray = gson.fromJson(reader, JsonArray.class);
+                        
+                        // Pretty print the result
+                        return new GsonBuilder().setPrettyPrinting().create().toJson(recipeArray);
+                    } catch (JsonSyntaxException e) {
+                        e.printStackTrace();
+                        
+                        // Try to fix common JSON formatting issues
+                        String cleanedJson = cleanJsonString(jsonText);
+                        try {
+                            JsonReader reader = new JsonReader(new StringReader(cleanedJson));
+                            reader.setLenient(true);
+                            JsonArray recipeArray = gson.fromJson(reader, JsonArray.class);
+                            return new GsonBuilder().setPrettyPrinting().create().toJson(recipeArray);
+                        } catch (Exception e2) {
+                            e2.printStackTrace();
+                            return "Could not parse recipe JSON: " + e2.getMessage();
+                        }
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error parsing Gemini response: " + e.getMessage();
         }
     
         return "Could not parse Gemini response.";
-    }    
+    }
+    
+    // Helper method to clean and fix malformed JSON
+    private static String cleanJsonString(String jsonText) {
+        // Remove any leading/trailing whitespace
+        String cleaned = jsonText.trim();
+        
+        // Ensure it starts with a bracket
+        if (!cleaned.startsWith("[")) {
+            cleaned = "[" + cleaned;
+        }
+        
+        // Ensure it ends with a bracket
+        if (!cleaned.endsWith("]")) {
+            cleaned = cleaned + "]";
+        }
+        
+        // Remove any invalid control characters
+        cleaned = cleaned.replaceAll("[\u0000-\u001F]", " ");
+        
+        return cleaned;
+    }
 }

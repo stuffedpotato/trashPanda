@@ -24,12 +24,14 @@ public class WantListService {
                 double quantity = rs.getDouble("quantity");
                 String units = rs.getString("units");
 
-                // Determine the appropriate unit type from the string
+                // Convert units string to enum with error handling
                 ItemQuantityType qtyType;
                 try {
-                    qtyType = ItemQuantityType.valueOf(units.toUpperCase());
-                } catch (IllegalArgumentException e) {
-                    qtyType = ItemQuantityType.UNIT; // Default to UNIT if not found
+                    qtyType = convertStringToItemQuantityType(units);
+                    System.out.println("Successfully converted units: " + units + " to enum: " + qtyType);
+                } catch (Exception e) {
+                    System.out.println("Failed to convert units: " + units + " - Error: " + e.getMessage());
+                    qtyType = ItemQuantityType.UNIT; // Default to UNIT if conversion fails
                 }
 
                 Item item = new Item(ingredient, null, qtyType);
@@ -48,9 +50,12 @@ public class WantListService {
         String sql = "INSERT INTO wantlist (username, ingredient, quantity, units) " +
                 "VALUES (?, ?, ?, ?)";
         
+        // Convert the enum to a string the database can handle
+        String unitString = convertItemQuantityTypeToString(item.getQtyType());
+        
         System.out.println("Executing SQL: " + sql);
         System.out.println("With parameters: username=" + username + ", ingredient=" + item.getName() + 
-                           ", quantity=" + qty + ", units=" + item.getQtyType().name());
+                           ", quantity=" + qty + ", units=" + unitString);
     
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -58,7 +63,7 @@ public class WantListService {
             stmt.setString(1, username);
             stmt.setString(2, item.getName());
             stmt.setDouble(3, qty);
-            stmt.setString(4, item.getQtyType().name());
+            stmt.setString(4, unitString);
     
             int rowsAffected = stmt.executeUpdate();
             System.out.println("Rows affected: " + rowsAffected);
@@ -81,7 +86,11 @@ public class WantListService {
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
 
                 stmt.setDouble(1, qty);
-                stmt.setString(2, item.getQtyType().name());
+                
+                // Convert the enum to a string the database can handle
+                String unitString = convertItemQuantityTypeToString(item.getQtyType());
+                stmt.setString(2, unitString);
+                
                 stmt.setString(3, username);
                 stmt.setString(4, item.getName());
 
@@ -110,6 +119,76 @@ public class WantListService {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+    
+    // Helper method to convert unit strings from the frontend to enum values
+    private ItemQuantityType convertStringToItemQuantityType(String unitString) {
+        if (unitString == null || unitString.isEmpty()) {
+            return ItemQuantityType.UNIT;
+        }
+        
+        switch (unitString.toUpperCase()) {
+            case "G":
+                return ItemQuantityType.GRAM;
+            case "KG":
+                return ItemQuantityType.KILOGRAM;
+            case "ML":
+                return ItemQuantityType.MILLILITER;
+            case "L":
+                return ItemQuantityType.LITER;
+            case "TSP":
+                return ItemQuantityType.TSP;
+            case "TBSP":
+                return ItemQuantityType.TBSP;
+            case "CUP":
+                return ItemQuantityType.CUP;
+            case "OZ":
+                return ItemQuantityType.OZ;
+            case "LB":
+                return ItemQuantityType.LB;
+            case "UNIT":
+                return ItemQuantityType.UNIT;
+            case "PIECE":
+                return ItemQuantityType.PIECE;
+            case "PACK":
+                return ItemQuantityType.PACK;
+            case "BOTTLE":
+                return ItemQuantityType.BOTTLE;
+            case "CAN":
+                return ItemQuantityType.CAN;
+            case "BOX":
+                return ItemQuantityType.BOX;
+            case "BAG":
+                return ItemQuantityType.BAG;
+            case "JAR":
+                return ItemQuantityType.JAR;
+            case "SLICES":
+                return ItemQuantityType.PIECE;
+            default:
+                System.out.println("Unknown unit type: " + unitString + ", defaulting to UNIT");
+                return ItemQuantityType.UNIT;
+        }
+    }
+    
+    // Helper method to convert enum values to strings for the database
+    private String convertItemQuantityTypeToString(ItemQuantityType qtyType) {
+        if (qtyType == null) {
+            return "UNIT";
+        }
+        
+        switch (qtyType) {
+            case GRAM:
+                return "G";
+            case KILOGRAM:
+                return "KG";
+            case MILLILITER:
+                return "ML";
+            case LITER:
+                return "L";
+            // For the rest, just use the enum name
+            default:
+                return qtyType.name();
         }
     }
 }

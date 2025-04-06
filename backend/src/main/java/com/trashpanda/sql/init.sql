@@ -16,13 +16,14 @@ CREATE TABLE profiles
     contact   VARCHAR(100) NOT NULL
 );
 
+-- Insert demo users that will produce matches
 INSERT INTO profiles (username, password, firstname, lastname, longitude, latitude, radius, contact)
 VALUES
-    ('christine', 'meow1234', 'Christine', 'Doe', -122.4194, 37.7749, 10, 'contact1@gmail.com'),
-('avi', 'meow5678', 'Avi', 'Doe', -118.2437, 34.0522, 15, 'contact2@gmail.com'),
-('piyusha', 'meow91011', 'Piyusha', 'Doe', -74.0060, 40.7128, 20, 'contact3@gmail.com'),
-('harper', 'meow121314', 'Harper', 'Doe', -87.6298, 41.8781, 3, 'contact4@gmail.com'),
-('charity', 'meow151617', 'Charity', 'Doe', -73.9352, 40.7306, 10, 'contact5@gmail.com');
+    ('piyusha', 'password123', 'Piyusha', 'User', -123.1207, 49.2827, 10, 'demo@example.com'),
+    ('avi', 'password123', 'Avi', 'One', -123.1217, 49.2837, 15, 'avi@example.com'),
+    ('harper', 'password123', 'Harper', 'Two', -123.1227, 49.2847, 8, 'harper@example.com'),
+    ('charity', 'password123', 'Charity', 'Away', -120.0000, 45.0000, 10, 'charity@example.com'),
+    ('christine', 'meow1234', 'Christine', 'Doe', -123.1207, 49.2827, 10, 'christine@example.com');
 
 CREATE TABLE sharelist
 (
@@ -35,17 +36,31 @@ CREATE TABLE sharelist
     CONSTRAINT fk_share_user FOREIGN KEY (username) REFERENCES profiles(username) ON DELETE CASCADE
 );
 
+-- Create share list entries for piyusha
 INSERT INTO sharelist (username, ingredient, quantity, units, expiration_date)
 VALUES
-    ('christine', 'sugar', 1, 'tsp', '2025-06-01'),
-('christine', 'spinach', 4, 'cups', '2025-05-15'),
-('christine', 'rice', 500, 'g', '2025-07-01'),
-('christine', 'olive oil', 1, 'L', '2025-08-10'),
-('christine', 'bread', 8, 'slices', '2025-04-25'),
-('avi', 'spinach', 4, 'cups', '2025-05-15'),
-('piyusha', 'rice', 500, 'g', '2025-07-01'),
-('harper', 'olive oil', 1, 'L', '2025-08-10'),
-('charity', 'bread', 8, 'slices', '2025-04-25');
+    ('piyusha', 'tomatoes', 5, 'UNIT', '2025-05-10'),
+    ('piyusha', 'rice', 2, 'KG', '2025-08-15'),
+    ('piyusha', 'pasta', 500, 'G', '2025-07-20'),
+    
+    -- Create share list entries for avi that match piyusha's wants
+    ('avi', 'onions', 6, 'UNIT', '2025-05-15'),
+    ('avi', 'garlic', 10, 'UNIT', '2025-06-01'),
+    ('avi', 'flour', 1, 'KG', '2025-07-10'),
+    
+    -- Create share list entries for harper that match piyusha's wants
+    ('harper', 'olive oil', 500, 'ML', '2025-08-20'),
+    ('harper', 'salt', 250, 'G', '2026-01-15'),
+    
+    -- Create entries for charity user (should not match due to distance)
+    ('charity', 'garlic', 5, 'UNIT', '2025-05-30'),
+    
+    -- Original data for Christine
+    ('christine', 'sugar', 1, 'TSP', '2025-06-01'),
+    ('christine', 'spinach', 4, 'CUP', '2025-05-15'),
+    ('christine', 'rice', 500, 'G', '2025-07-01'),
+    ('christine', 'olive oil', 1, 'L', '2025-08-10'),
+    ('christine', 'bread', 8, 'SLICES', '2025-04-25');
 
 CREATE TABLE wantlist
 (
@@ -59,13 +74,26 @@ CREATE TABLE wantlist
 
 INSERT INTO wantlist (username, ingredient, quantity, units)
 VALUES
-    ('christine', 'sugar', 1, 'tsp'),
-('avi', 'spinach', 4, 'cups'),
-('piyusha', 'rice', 500, 'g'),
-('piyusha', 'beans', 500, 'g'),
-('piyusha', 'pesto', 500, 'g'),
-('harper', 'olive oil', 1, 'L'),
-('charity', 'bread', 8, 'slices');
+    -- Create want list entries for piyusha
+    ('piyusha', 'onions', 3, 'UNIT'),
+    ('piyusha', 'garlic', 2, 'UNIT'),
+    ('piyusha', 'olive oil', 250, 'ML'),
+    
+    -- Create want list entries for avi that match piyusha's shares
+    ('avi', 'tomatoes', 3, 'UNIT'),
+    ('avi', 'pasta', 200, 'G'),
+    
+    -- Create want list entries for harper that match piyusha's shares
+    ('harper', 'rice', 1, 'KG'),
+    
+    -- Want list for charity user
+    ('charity', 'rice', 2, 'KG'),
+    
+    -- Original data 
+    ('christine', 'sugar', 1, 'TSP'),
+    ('avi', 'spinach', 4, 'CUP'),
+    ('harper', 'olive oil', 1, 'L'),
+    ('christine', 'bread', 8, 'SLICES');
 
 -- CREATE TABLE communities
 -- (
