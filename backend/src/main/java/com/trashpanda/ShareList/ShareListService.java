@@ -2,10 +2,40 @@ package com.trashpanda.ShareList;
 
 import com.trashpanda.DatabaseConfig;
 import com.trashpanda.Item;
+import com.trashpanda.ItemQuantityType;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShareListService {
+    public List<ShareListEntry> getShareListEntries(String username) {
+        List<ShareListEntry> entries = new ArrayList<>();
+        String sql = "SELECT ingredient, quantity, units, expiration_date FROM sharelist WHERE username = ?";
+
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String ingredient = rs.getString("ingredient");
+                double quantity = rs.getDouble("quantity");
+//                String units = rs.getString("units");
+                Date expirationDate = rs.getDate("expiration_date");
+
+                Item item = new Item(ingredient, null, ItemQuantityType.TSP); // placeholder enum
+                ShareListEntry entry = new ShareListEntry(username, item, quantity, expirationDate);
+                entries.add(entry);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return entries;
+    }
 
     public boolean insertShareListEntry(String username, Item item, double qty, Date expirationDate) {
         String sql = "INSERT INTO sharelist (username, ingredient, quantity, units, expiration_date) " +

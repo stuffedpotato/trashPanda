@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./src/output.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Khula:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo-container">
+            <img src="raccoon-icon.png" alt="Raccoon Icon" class="logo-icon">
+            <span class="logo-text">Trash Panda</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">PROFILE</a></li>
+            <li><a href="home.html">HOME</a></li>
+            <li><a href="community.html">COMMUNITY</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+      <div class="section want">
+          <h2 style="color: #3E8440;">WANT</h2>
+      </div>
+        <div class="section have">
+            <h2 style="color: #3E8440;">HAVE</h2>
+            <div id="share-list-results"></div>
+        </div>
+      <!-- <button class="btn find-recipes">Find Recipes!</button>
+      <button class="btn find-matches">Find Matches!</button> -->
+      <div class="map-container">
+          <!-- Map image -->
+          <!-- <img src="map.png" alt="Map with locations marked by stars"> -->
+          <h2 style="color: #3E8440;">NEAR YOU</h2>
+      </div>
+      <div class="buttons-container">
+        <button class="btn find-recipes">Find Recipes!</button>
+        <button class="btn find-matches">Find Matches!</button>
+    </div>
+</div>
+
+    <script>
+        async function getShareList() {
+            const username = localStorage.getItem('username');
+
+            if (username) {
+                console.log('Logged-in user:', username);
+            } else {
+                console.log('No user logged in');
+            }
+
+            const resultsDiv = document.getElementById('share-list-results');
+
+            if (!username) {
+                resultsDiv.innerHTML = '<p>Please enter a username.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:4567/sharelist/${username}`);
+                if (!response.ok) throw new Error("Failed to fetch share list");
+
+                const data = await response.json();
+
+                if (data.length === 0) {
+                    resultsDiv.innerHTML = "<p>No items found.</p>";
+                    return;
+                }
+
+                resultsDiv.innerHTML = `
+        <ul style="list-style-type: none; padding-left: 0;">
+          ${data.map(entry => `
+            <li style="margin-bottom: 8px;">
+              <strong>${entry.item.name}</strong> – ${entry.qty} ${entry.item.qtyType}
+              ${entry.expirationDate ? `(Expires: ${entry.expirationDate})` : ""}
+            </li>
+          `).join("")}
+        </ul>
+      `;
+            } catch (error) {
+                console.error(error);
+                resultsDiv.innerHTML = '<p>Error fetching data.</p>';
+            }
+        }
+
+        getShareList();
+    </script>
+
+
+</body>
+</html>
+
