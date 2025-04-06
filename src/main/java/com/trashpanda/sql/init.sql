@@ -12,17 +12,17 @@ CREATE TABLE profiles
     longitude NUMERIC,
     latitude  NUMERIC,
     password  VARCHAR(100) NOT NULL,
-    radius    INTEGER
+    radius    INTEGER,
+    contact   VARCHAR(100) NOT NULL
 );
 
-INSERT INTO profiles (username, password, firstname, lastname, longitude, latitude, radius)
+INSERT INTO profiles (username, password, firstname, lastname, longitude, latitude, radius, contact)
 VALUES
-    ('christine', 'meow1234', 'Christine', 'Doe', -122.4194, 37.7749, 10),
-('avi', 'meow5678', 'Avi', 'Doe', -118.2437, 34.0522, 15),
-('piyusha', 'meow91011', 'Piyusha', 'Doe', -74.0060, 40.7128, 20),
-('harper', 'meow121314', 'Harper', 'Doe', -87.6298, 41.8781, 25),
-('charity', 'meow151617', 'Charity', 'Doe', -73.9352, 40.7306, 30);
-
+    ('christine', 'meow1234', 'Christine', 'Doe', -122.4194, 37.7749, 10, 'contact1@gmail.com'),
+('avi', 'meow5678', 'Avi', 'Doe', -118.2437, 34.0522, 15, 'contact2@gmail.com'),
+('piyusha', 'meow91011', 'Piyusha', 'Doe', -74.0060, 40.7128, 20, 'contact3@gmail.com'),
+('harper', 'meow121314', 'Harper', 'Doe', -87.6298, 41.8781, 3, 'contact4@gmail.com'),
+('charity', 'meow151617', 'Charity', 'Doe', -73.9352, 40.7306, 10, 'contact5@gmail.com');
 
 CREATE TABLE sharelist
 (
@@ -70,10 +70,10 @@ VALUES
 -- INSERT INTO communities (communityname, description)
 -- VALUES
 --     ('UBC Garden Club', 'A community for gardening enthusiasts to share fresh produce.'),
--- ('test2', 'description2'),
--- ('test3', 'description3'),
--- ('test4', 'description4'),
--- ('test5', 'description5');
+--     ('test2', 'description2'),
+--     ('test3', 'description3'),
+--     ('test4', 'description4'),
+--     ('test5', 'description5');
 --
 --
 -- CREATE TABLE usercommunities
@@ -88,7 +88,6 @@ VALUES
 -- INSERT INTO usercommunities (communityname, username)
 -- VALUES
 --     ('UBC Garden Club', 'christine'),
--- ('UBC Garden Club', 'avi'),
--- ('test2', 'piyusha'),
--- ('test3', 'harper'),
--- ('test3', 'charity');
+--     ('UBC Garden Club', 'avi'),
+--     ('test2', 'piyusha'),
+--     ('test

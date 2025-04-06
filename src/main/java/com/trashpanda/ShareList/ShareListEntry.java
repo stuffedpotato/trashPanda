@@ -1,19 +1,25 @@
-package com.trashpanda;
-import java.time.LocalDate;
-import java.util.Optional;
+package com.trashpanda.ShareList;
+import com.trashpanda.Item;
+
+import java.sql.Date;
 
 public class ShareListEntry {
+    String username;
     private Item item;
     private double qty;
-    private Optional<LocalDate> expirationDate;
+    private Date expirationDate;
 
-    public ShareListEntry(Item item, double qty, Optional<LocalDate> expirationDate) {
+    public ShareListEntry(String username, Item item, double qty, Date expirationDate) {
+        this.username = username;
         this.item = item;
         this.qty = qty;
         this.expirationDate = expirationDate;
     }
 
     // Getters
+    public String getUsername() {
+        return username;
+    }
     public Item getItem() {
         return item;
     }
@@ -22,13 +28,13 @@ public class ShareListEntry {
         return qty;
     }
 
-    public Optional<LocalDate> getExpirationDate() {
+    public Date getExpirationDate() {
         return expirationDate;
     }
 
     // SETTERS
 
-    public void setExpirationDate(Optional<LocalDate> expirationDate) {
+    public void setExpirationDate(Date expirationDate) {
         this.expirationDate = expirationDate;
     }
 

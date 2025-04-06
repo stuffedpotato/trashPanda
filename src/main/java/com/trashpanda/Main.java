@@ -2,9 +2,13 @@ package com.trashpanda;
 
 import java.util.Arrays;
 import java.util.Optional;
+import com.trashpanda.ShareList.ShareListController;
+
+import static spark.Spark.*;
 
 public class Main {
-    public static void main(String[] args) {
+        public static void main(String[] args) {
+                port(4567);
         try {
             // 🔸 1. Create sample share list
             Item tomato = new Item("tomatoes", ItemCategory.VEGETABLE, ItemQuantityType.COUNT);
@@ -23,5 +27,7 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+                before((req, res) -> res.header("Access-Control-Allow-Origin", "*"));
+                ShareListController.initializeRoutes();
+        }
 }
