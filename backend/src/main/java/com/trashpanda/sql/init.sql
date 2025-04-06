@@ -62,6 +62,8 @@ VALUES
     ('christine', 'sugar', 1, 'tsp'),
 ('avi', 'spinach', 4, 'cups'),
 ('piyusha', 'rice', 500, 'g'),
+('piyusha', 'beans', 500, 'g'),
+('piyusha', 'pesto', 500, 'g'),
 ('harper', 'olive oil', 1, 'L'),
 ('charity', 'bread', 8, 'slices');
 
