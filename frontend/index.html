@@ -80,7 +80,7 @@
       }
     }
     
-    #map {
+    #map, #profile-map {
       height: 500px;
       border-radius: 10px;
       border: 2px solid #3E8440;
@@ -156,7 +156,7 @@
       border-radius: 10px;
       border: 2px solid #3E8440;
       margin-top: 20px;
-      max-width: 600px;
+      max-width: 800px;
       margin-left: auto;
       margin-right: auto;
     }
@@ -179,9 +179,76 @@
       color: #3E8440;
     }
     
+    /* Status message */
+    .status-message {
+      padding: 12px;
+      margin: 15px 0;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+    }
+    
+    .status-success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .status-error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
     /* Utility classes */
     .hidden {
       display: none;
+    }
+    
+    /* Buttons */
+    .btn {
+      background-color: #3E8440;
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+    
+    .btn:hover {
+      background-color: #2a5c2d;
+    }
+    
+    /* Location update section */
+    .location-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px solid #3E8440;
+    }
+    
+    .location-display {
+      font-weight: bold;
+      color: #3E8440;
+      margin-bottom: 10px;
+    }
+    
+    .map-container {
+      position: relative;
+      margin-bottom: 15px;
+    }
+    
+    .map-instructions {
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      font-size: 14px;
+      max-width: 200px;
     }
   </style>
 </head>
@@ -198,7 +265,7 @@
         </ul>
     </nav>
 
-    <div class="profile-container">
+    <div id="profile-form-container" class="profile-container">
         <!-- Map Section -->
         <div id="map"></div>
       
@@ -208,11 +275,20 @@
           <label for="name">Username:</label>
           <input type="text" id="name" placeholder="Enter your username">
           
+          <label for="firstname">First Name:</label>
+          <input type="text" id="firstname" placeholder="Enter your first name">
+          
+          <label for="lastname">Last Name:</label>
+          <input type="text" id="lastname" placeholder="Enter your last name">
+          
+          <label for="password">Password:</label>
+          <input type="password" id="password" placeholder="Enter your password">
+          
           <label for="contact">Contact Information:</label>
           <input type="text" id="contact" placeholder="Enter your contact information">
       
           <label for="radius">Search Radius (km):</label>
-          <input type="number" id="radius" placeholder="Enter your desired search radius" min="1" max="50">
+          <input type="number" id="radius" placeholder="Enter your desired search radius" min="1" max="50" value="10">
           
           <button onclick="submitForm()">Create Account</button>
         </div>
@@ -220,83 +296,344 @@
 
     <div id="summary" class="hidden"></div>
     
+    <div id="existing-profile" class="hidden">
+        <!-- Will be populated with profile info -->
+    </div>
+    
+    <div id="status-container" class="hidden status-message"></div>
+    
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-      // Initialize the map
-      const map = L.map('map').setView([49.2827, -123.1207], 11); // Default to Vancouver
-    
-      // Add OpenStreetMap tiles
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
-    
-      let marker;
+      // API base URL
+      const API_BASE_URL = "http://localhost:4567";
+      
+      let map, profileMap;
+      let marker, profileMarker;
       let selectedLat = 49.2827;
       let selectedLng = -123.1207;
       
-      // Set default marker
-      marker = L.marker([selectedLat, selectedLng]).addTo(map);
-    
-      // Handle clicks on the map to add markers
-      map.on('click', function(e) {
-        selectedLat = e.latlng.lat.toFixed(5);
-        selectedLng = e.latlng.lng.toFixed(5);
-        console.log(`Selected Location: Lat: ${selectedLat}, Lng: ${selectedLng}`);
-    
-        if (marker) {
-          marker.setLatLng(e.latlng);
+      // Check if user already has a profile
+      document.addEventListener('DOMContentLoaded', function() {
+        const username = localStorage.getItem('username');
+        if (username) {
+          fetchUserProfile(username);
         } else {
-          marker = L.marker(e.latlng).addTo(map);
+          initializeCreateMap();
         }
       });
-    
-      function login() {
-        const username = document.getElementById('name').value;
+      
+      // Initialize the map for creating a profile
+      function initializeCreateMap() {
+        map = L.map('map').setView([49.2827, -123.1207], 11); // Default to Vancouver
+      
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
         
-        if (!username) {
-          alert('Please enter a username');
-          return false;
-        }
-    
-        localStorage.setItem('username', username);
-        console.log('Logged in as ' + username);
-        return true;
+        // Set default marker
+        marker = L.marker([selectedLat, selectedLng]).addTo(map);
+      
+        // Handle clicks on the map to add markers
+        map.on('click', function(e) {
+          selectedLat = e.latlng.lat.toFixed(5);
+          selectedLng = e.latlng.lng.toFixed(5);
+          console.log(`Selected Location: Lat: ${selectedLat}, Lng: ${selectedLng}`);
+      
+          if (marker) {
+            marker.setLatLng(e.latlng);
+          } else {
+            marker = L.marker(e.latlng).addTo(map);
+          }
+        });
       }
-    
-      // Function to handle form submission
-      function submitForm() {
-        if (!login()) return;
+      
+      // Initialize the map for updating a profile location
+      function initializeProfileMap(lat, lng) {
+        // Create a container for the profile map if it doesn't exist
+        if (!document.getElementById('profile-map-container')) {
+          const mapContainer = document.createElement('div');
+          mapContainer.id = 'profile-map-container';
+          mapContainer.className = 'map-container';
+          
+          const mapElement = document.createElement('div');
+          mapElement.id = 'profile-map';
+          mapElement.style.height = '400px';
+          
+          const instructions = document.createElement('div');
+          instructions.className = 'map-instructions';
+          instructions.innerHTML = 'Click anywhere on the map to update your location';
+          
+          mapContainer.appendChild(mapElement);
+          mapContainer.appendChild(instructions);
+          
+          document.querySelector('.location-section').appendChild(mapContainer);
+        }
         
-        const name = document.getElementById('name').value;
-        const contact = document.getElementById('contact').value;
-        const radius = document.getElementById('radius').value || 10;
-    
-        console.log('Form Data: ', { name, contact, radius, lat: selectedLat, lng: selectedLng });
+        profileMap = L.map('profile-map').setView([lat, lng], 11);
         
-        document.getElementById('map').classList.add('hidden');
-        document.querySelector('.form-container').classList.add('hidden');
-    
-        // Prepare the summary HTML
-        const summaryHtml = `
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(profileMap);
+        
+        profileMarker = L.marker([lat, lng]).addTo(profileMap);
+        
+        // Handle clicks on the map to update location
+        profileMap.on('click', function(e) {
+          const newLat = e.latlng.lat.toFixed(5);
+          const newLng = e.latlng.lng.toFixed(5);
+          
+          profileMarker.setLatLng(e.latlng);
+          
+          // Update the displayed location
+          document.getElementById('current-location').textContent = 
+            `Latitude: ${newLat}, Longitude: ${newLng}`;
+          
+          // Enable the update button
+          document.getElementById('update-location-btn').disabled = false;
+          
+          // Store the new location temporarily
+          localStorage.setItem('new-lat', newLat);
+          localStorage.setItem('new-lng', newLng);
+        });
+      }
+      
+      // Function to fetch user profile from backend
+      async function fetchUserProfile(username) {
+        try {
+          // In a real app, you would fetch the profile from the backend
+          // For now, we'll use localStorage as a placeholder
+          
+          const firstname = localStorage.getItem('firstname') || '';
+          const lastname = localStorage.getItem('lastname') || '';
+          const contact = localStorage.getItem('contact') || '';
+          const radius = localStorage.getItem('radius') || '10';
+          const lat = localStorage.getItem('lat') || '49.2827';
+          const lng = localStorage.getItem('lng') || '-123.1207';
+          
+          // Display the profile
+          showExistingProfile(username, firstname, lastname, contact, radius, lat, lng);
+          
+        } catch (error) {
+          console.error('Error fetching profile:', error);
+          showStatus('Error loading profile information', false);
+        }
+      }
+      
+      // Function to display existing profile
+      function showExistingProfile(username, firstname, lastname, contact, radius, lat, lng) {
+        document.getElementById('profile-form-container').classList.add('hidden');
+        
+        const profileHtml = `
           <div class="summary">
-            <h2>Account Information</h2>
-            <p><strong>Username:</strong> ${name}</p>
+            <h2>Your Profile</h2>
+            <p><strong>Username:</strong> ${username}</p>
+            <p><strong>Name:</strong> ${firstname} ${lastname}</p>
             <p><strong>Contact:</strong> ${contact}</p>
             <p><strong>Search Radius:</strong> ${radius} km</p>
-            <p><strong>Location:</strong> Latitude: ${selectedLat}, Longitude: ${selectedLng}</p>
-            <p class="success-message" style="color: #3E8440; text-align: center; margin-top: 20px; font-weight: bold;">
-              Account created successfully! You can now access <a href="home.html" style="color: #3E8440;">Home</a> to start sharing items.
-            </p>
+            
+            <div class="location-section">
+              <p><strong>Location:</strong> <span id="current-location">Latitude: ${lat}, Longitude: ${lng}</span></p>
+              <p>Click on the map below to change your location:</p>
+              
+              <div id="location-buttons">
+                <button id="update-location-btn" class="btn" onclick="updateLocation('${username}')" disabled>Update Location</button>
+                <button class="btn" onclick="cancelLocationUpdate()">Cancel</button>
+              </div>
+            </div>
+            
+            <p style="margin-top: 20px;"><a href="home.html" style="color: #3E8440; font-weight: bold;">Go to Home</a> to start sharing items.</p>
+            <button onclick="logOut()" class="btn" style="margin-top: 10px;">Log Out</button>
           </div>
         `;
-    
-        // Set the summary content and show it
-        document.getElementById('summary').innerHTML = summaryHtml;
-        document.getElementById('summary').classList.remove('hidden');
         
-        // In a real application, you would send this data to your backend
-        // to create a new user profile
+        document.getElementById('existing-profile').innerHTML = profileHtml;
+        document.getElementById('existing-profile').classList.remove('hidden');
+        
+        // Initialize the map for location updates
+        setTimeout(() => {
+          initializeProfileMap(parseFloat(lat), parseFloat(lng));
+        }, 300);
+      }
+      
+      // Function to update location
+      async function updateLocation(username) {
+        const newLat = localStorage.getItem('new-lat');
+        const newLng = localStorage.getItem('new-lng');
+        
+        if (!newLat || !newLng) {
+          showStatus('Please select a new location on the map', false);
+          return;
+        }
+        
+        try {
+          // In a real app, send an API request to update the location
+          const response = await fetch(`${API_BASE_URL}/update-location`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: username,
+              latitude: parseFloat(newLat),
+              longitude: parseFloat(newLng)
+            })
+          });
+          
+          // For now, simulate a successful update
+          localStorage.setItem('lat', newLat);
+          localStorage.setItem('lng', newLng);
+          
+          showStatus('Location updated successfully!', true);
+          
+          // Disable the update button until another change is made
+          document.getElementById('update-location-btn').disabled = true;
+          
+          // Clear the temporary location
+          localStorage.removeItem('new-lat');
+          localStorage.removeItem('new-lng');
+          
+        } catch (error) {
+          console.error('Error updating location:', error);
+          showStatus('Error updating location. Please try again.', false);
+        }
+      }
+      
+      // Function to cancel location update
+      function cancelLocationUpdate() {
+        const lat = localStorage.getItem('lat');
+        const lng = localStorage.getItem('lng');
+        
+        // Reset the marker and map view
+        profileMap.setView([parseFloat(lat), parseFloat(lng)], 11);
+        profileMarker.setLatLng([parseFloat(lat), parseFloat(lng)]);
+        
+        // Reset the displayed location
+        document.getElementById('current-location').textContent = 
+          `Latitude: ${lat}, Longitude: ${lng}`;
+          
+        // Disable the update button
+        document.getElementById('update-location-btn').disabled = true;
+        
+        // Clear the temporary location
+        localStorage.removeItem('new-lat');
+        localStorage.removeItem('new-lng');
+      }
+      
+      // Function to log out
+      function logOut() {
+        localStorage.removeItem('username');
+        localStorage.removeItem('firstname');
+        localStorage.removeItem('lastname');
+        localStorage.removeItem('contact');
+        localStorage.removeItem('radius');
+        localStorage.removeItem('lat');
+        localStorage.removeItem('lng');
+        
+        document.getElementById('existing-profile').classList.add('hidden');
+        document.getElementById('profile-form-container').classList.remove('hidden');
+        
+        // Initialize the creation map
+        initializeCreateMap();
+      }
+      
+      // Function to show status messages
+      function showStatus(message, isSuccess) {
+        const statusContainer = document.getElementById('status-container');
+        statusContainer.textContent = message;
+        statusContainer.className = isSuccess ? 
+          'status-message status-success' : 
+          'status-message status-error';
+        statusContainer.classList.remove('hidden');
+        
+        // Hide status after 3 seconds
+        setTimeout(() => {
+          statusContainer.classList.add('hidden');
+        }, 3000);
+      }
+      
+      // Function to handle form submission for creating a profile
+      function submitForm() {
+        const name = document.getElementById('name').value;
+        const firstname = document.getElementById('firstname').value;
+        const lastname = document.getElementById('lastname').value;
+        const password = document.getElementById('password').value;
+        const contact = document.getElementById('contact').value;
+        const radius = document.getElementById('radius').value || 10;
+        
+        if (!name || !firstname || !lastname || !password || !contact) {
+          showStatus('Please fill in all required fields', false);
+          return;
+        }
+        
+        // Create the user profile
+        createProfile(name, firstname, lastname, password, contact, radius, selectedLat, selectedLng);
+      }
+      
+      // Function to create a profile
+      async function createProfile(username, firstname, lastname, password, contact, radius, lat, lng) {
+        try {
+          // In a real app, send the data to your backend
+          const profileData = {
+            username,
+            firstname,
+            lastname,
+            password,
+            contact,
+            radius,
+            latitude: lat,
+            longitude: lng
+          };
+          
+          console.log('Creating profile:', profileData);
+          
+          // Simulate an API call
+          // In a real app, you would use fetch() to send data to your backend
+          /*
+          const response = await fetch(`${API_BASE_URL}/profiles`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(profileData)
+          });
+          */
+          
+          // For now, store in localStorage
+          localStorage.setItem('username', username);
+          localStorage.setItem('firstname', firstname);
+          localStorage.setItem('lastname', lastname);
+          localStorage.setItem('contact', contact);
+          localStorage.setItem('radius', radius);
+          localStorage.setItem('lat', lat);
+          localStorage.setItem('lng', lng);
+          
+          // Show success message
+          showStatus('Profile created successfully!', true);
+          
+          // Show the summary
+          document.getElementById('profile-form-container').classList.add('hidden');
+          
+          // Prepare the summary HTML
+          const summaryHtml = `
+            <div class="summary">
+              <h2>Account Created Successfully!</h2>
+              <p><strong>Username:</strong> ${username}</p>
+              <p><strong>Name:</strong> ${firstname} ${lastname}</p>
+              <p><strong>Contact:</strong> ${contact}</p>
+              <p><strong>Search Radius:</strong> ${radius} km</p>
+              <p><strong>Location:</strong> Latitude: ${lat}, Longitude: ${lng}</p>
+              <p class="success-message" style="color: #3E8440; text-align: center; margin-top: 20px; font-weight: bold;">
+                Your account has been created! You can now access <a href="home.html" style="color: #3E8440;">Home</a> to start sharing items.
+              </p>
+            </div>
+          `;
+          
+          // Set the summary content and show it
+          document.getElementById('summary').innerHTML = summaryHtml;
+          document.getElementById('summary').classList.remove('hidden');
+          
+        } catch (error) {
+          console.error('Error creating profile:', error);
+          showStatus('Error creating profile. Please try again.', false);
+        }
       }
     </script>
 </body>
