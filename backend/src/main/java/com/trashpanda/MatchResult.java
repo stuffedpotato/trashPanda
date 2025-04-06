@@ -1,7 +1,12 @@
 package com.trashpanda;
 
+import com.google.gson.annotations.Expose;
+
 public class MatchResult {
+    @Expose
     private User user;
+    
+    @Expose
     private double distance;
 
     public MatchResult(User user, double distance) {

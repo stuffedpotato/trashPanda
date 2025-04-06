@@ -2,10 +2,8 @@ package com.trashpanda;
 
 import com.trashpanda.ShareList.ShareListEntry;
 import com.google.gson.*;
-import com.google.gson.stream.JsonReader;
 
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -23,9 +21,14 @@ public class RecipeGenerator {
     private static final String API_KEY = dotenv.get("GEMINI_API_KEY");
 
     public static String generateRecipesFromShareList(List<ShareListEntry> shareList) {
+        System.out.println("Attempting to generate recipes with " + shareList.size() + " ingredients");
+        
         if (API_KEY == null || API_KEY.isEmpty()) {
+            System.out.println("ERROR: GEMINI_API_KEY not found or empty");
             return "Error: GEMINI_API_KEY not set in environment variables.";
         }
+        
+        System.out.println("Using API key: " + API_KEY.substring(0, 4) + "...");
 
         String ingredients = shareList.stream()
                 .map(entry -> entry.getItem().getName())
@@ -34,20 +37,11 @@ public class RecipeGenerator {
         String prompt = String.format(
                 "Using the following ingredients: %s, generate 2-3 creative and simple recipes.\n\n" +
                         "For each recipe, provide:\n" +
-                        "- Recipe title\n" +
-                        "- A short 2-3 sentence summary\n" +
-                        "- A list of ingredients from the provided list\n" +
-                        "- A list of additional ingredients\n\n" +
-                        "Respond in JSON array format, like this:\n" +
-                        "[\n" +
-                        "  {\n" +
-                        "    \"title\": \"Fried Rice with Spinach\",\n" +
-                        "    \"summary\": \"Quick and easy fried rice using pantry staples.\",\n" +
-                        "    \"usedIngredients\": [\"rice\", \"spinach\", \"olive oil\"],\n" +
-                        "    \"neededIngredients\": [\"soy sauce\", \"onion\", \"garlic\"]\n" +
-                        "  },\n" +
-                        "  ...more recipes\n" +
-                        "]\n" +
+                        "1. Recipe title (on a line by itself)\n" +
+                        "2. A short 2-3 sentence summary\n" +
+                        "3. A section called 'Ingredients You Have:' that lists items from the provided list\n" +
+                        "4. A section called 'Additional Ingredients Needed:' that lists other ingredients\n\n" +
+                        "Format each recipe with clear section headers and separate each recipe with a line of dashes (----).\n" +
                         "Avoid abbreviations (e.g., write 'tablespoons' not 'tbsp').",
                 ingredients);
 
@@ -82,15 +76,21 @@ public class RecipeGenerator {
                 os.write(input, 0, input.length);
             }
 
-            // Check response code
+            // Check if there was an error
             int responseCode = conn.getResponseCode();
             if (responseCode != 200) {
-                Scanner errorScanner = new Scanner(conn.getErrorStream());
+                System.out.println("Error from Gemini API: Response code " + responseCode);
+                
+                // Read error message
                 StringBuilder errorResponse = new StringBuilder();
-                while (errorScanner.hasNextLine()) {
-                    errorResponse.append(errorScanner.nextLine());
+                try (Scanner scanner = new Scanner(conn.getErrorStream())) {
+                    while (scanner.hasNextLine()) {
+                        errorResponse.append(scanner.nextLine());
+                    }
                 }
-                return "API Error: " + responseCode + " - " + errorResponse.toString();
+                System.out.println("Error details: " + errorResponse.toString());
+                
+                return "Failed to generate recipes. API response: " + responseCode;
             }
 
             Scanner scanner = new Scanner(conn.getInputStream());
@@ -99,8 +99,10 @@ public class RecipeGenerator {
             while (scanner.hasNextLine()) {
                 response.append(scanner.nextLine());
             }
+            
+            System.out.println("Received API response, length: " + response.length());
 
-            return parseGeminiResponse(response.toString());
+            return extractPlainTextRecipes(response.toString());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -108,74 +110,44 @@ public class RecipeGenerator {
         }
     }
 
-    private static String parseGeminiResponse(String rawJson) {
+    // Extract plain text recipes from Gemini response
+    private static String extractPlainTextRecipes(String response) {
         try {
-            // Create a Gson instance with lenient parsing
-            Gson gson = new GsonBuilder().setLenient().create();
+            // Parse the response JSON
+            JsonObject jsonResponse = JsonParser.parseString(response).getAsJsonObject();
+            JsonArray candidates = jsonResponse.getAsJsonArray("candidates");
             
-            // Parse the main response
-            JsonObject root = gson.fromJson(rawJson, JsonObject.class);
-            JsonArray candidates = root.getAsJsonArray("candidates");
-        
             if (candidates != null && candidates.size() > 0) {
-                JsonObject content = candidates.get(0).getAsJsonObject().getAsJsonObject("content");
+                JsonObject firstCandidate = candidates.get(0).getAsJsonObject();
+                JsonObject content = firstCandidate.getAsJsonObject("content");
                 JsonArray parts = content.getAsJsonArray("parts");
-        
+                
                 if (parts != null && parts.size() > 0) {
-                    // Get the text content which should contain the recipes JSON
-                    String jsonText = parts.get(0).getAsJsonObject().get("text").getAsString();
-        
-                    try {
-                        // Use lenient parsing for the recipe JSON
-                        JsonReader reader = new JsonReader(new StringReader(jsonText));
-                        reader.setLenient(true);
-                        JsonArray recipeArray = gson.fromJson(reader, JsonArray.class);
-                        
-                        // Pretty print the result
-                        return new GsonBuilder().setPrettyPrinting().create().toJson(recipeArray);
-                    } catch (JsonSyntaxException e) {
-                        e.printStackTrace();
-                        
-                        // Try to fix common JSON formatting issues
-                        String cleanedJson = cleanJsonString(jsonText);
-                        try {
-                            JsonReader reader = new JsonReader(new StringReader(cleanedJson));
-                            reader.setLenient(true);
-                            JsonArray recipeArray = gson.fromJson(reader, JsonArray.class);
-                            return new GsonBuilder().setPrettyPrinting().create().toJson(recipeArray);
-                        } catch (Exception e2) {
-                            e2.printStackTrace();
-                            return "Could not parse recipe JSON: " + e2.getMessage();
-                        }
-                    }
+                    // Extract the text content directly without trying to parse it as JSON
+                    String recipeText = parts.get(0).getAsJsonObject().get("text").getAsString();
+                    return formatRecipeText(recipeText);
                 }
             }
+            
+            return "No recipes could be generated.";
+            
         } catch (Exception e) {
             e.printStackTrace();
-            return "Error parsing Gemini response: " + e.getMessage();
+            return "Error extracting recipes: " + e.getMessage();
         }
-    
-        return "Could not parse Gemini response.";
     }
     
-    // Helper method to clean and fix malformed JSON
-    private static String cleanJsonString(String jsonText) {
-        // Remove any leading/trailing whitespace
-        String cleaned = jsonText.trim();
+    // Format recipe text for better display
+    private static String formatRecipeText(String recipeText) {
+        // Replace multiple newlines with a single newline to clean up spacing
+        recipeText = recipeText.replaceAll("\\n{3,}", "\n\n");
         
-        // Ensure it starts with a bracket
-        if (!cleaned.startsWith("[")) {
-            cleaned = "[" + cleaned;
-        }
+        // Ensure recipe separators are formatted consistently
+        recipeText = recipeText.replaceAll("[-]{4,}", "\n\n----\n\n");
         
-        // Ensure it ends with a bracket
-        if (!cleaned.endsWith("]")) {
-            cleaned = cleaned + "]";
-        }
+        // Add HTML-friendly formatting (the frontend will handle this as HTML)
+        recipeText = recipeText.replaceAll("\\n", "<br>");
         
-        // Remove any invalid control characters
-        cleaned = cleaned.replaceAll("[\u0000-\u001F]", " ");
-        
-        return cleaned;
+        return recipeText;
     }
 }

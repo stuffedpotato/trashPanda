@@ -4,7 +4,6 @@ import com.trashpanda.ItemQuantityType;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
