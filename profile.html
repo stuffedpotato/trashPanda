@@ -26,7 +26,7 @@
         </ul>
     </nav>
 
-<h3 style = "margin-left: 20px;" >Select Your Location</h3>
+<!-- <h3 style = "margin-left: 20px;" >Select Your Location</h3> -->
 <div class="profile-container">
     <!-- Map Section -->
     <div id="map"></div>
@@ -45,6 +45,8 @@
       <button onclick="submitForm()">Create Account</button>
     </div>
 </div>
+
+<div id="summary" class="hidden"></div>
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
@@ -78,7 +80,22 @@
     const radius = document.getElementById('radius').value;
 
     console.log('Form Data: ', { name, contact, radius });
-    document.getElementById('profile-container').classList.add('hidden');
+    document.getElementById('map').classList.add('hidden');
+    document.querySelector('.form-container').classList.add('hidden');
+
+        // Prepare the summary HTML
+        const summaryHtml = `
+      <div class="summary">
+        <h2>Summary of Your Submission</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Contact:</strong> ${contact}</p>
+        <p><strong>Search Radius:</strong> ${radius}</p>
+      </div>
+    `;
+
+    // Set the summary content and show it
+    document.getElementById('summary').innerHTML = summaryHtml;
+    document.getElementById('summary').classList.remove('hidden');
   }
 </script>
 
