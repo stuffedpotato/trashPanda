@@ -1,33 +1,23 @@
 package com.trashpanda;
-import com.trashpanda.ShareList.ShareListEntry;
-import java.util.Arrays;
-import com.trashpanda.ShareList.ShareListController;
 
-import static spark.Spark.*;
+import com.trashpanda.ShareList.ShareListEntry;
+import com.trashpanda.ShareList.ShareListService;
+
+import java.util.List;
 
 public class Main {
-        public static void main(String[] args) {
-            Database.initializeDatabase();
-            port(4567);
-        try {
-            // 🔸 1. Create sample share list
-            Item tomato = new Item("tomatoes", ItemCategory.VEGETABLE, ItemQuantityType.COUNT);
-            Item rice = new Item("rice", ItemCategory.GRAIN, ItemQuantityType.CUP);
+    public static void main(String[] args) {
+        // Initialize the database first
+        Database.initializeDatabase();
+        
+        ShareListService service = new ShareListService();
+        List<ShareListEntry> shareList = service.getShareListEntries("christine");
 
-            ShareListEntry e1 = new ShareListEntry("piyusha", tomato, 3, null);
-            ShareListEntry e2 = new ShareListEntry("christine", rice, 1, null);
-
-            // 🔸 2. Call the fetcher
-            String recipesJson = RecipeFetcher.getRecipesFromShareList(Arrays.asList(e1, e2));
-
-            // 🔸 3. Print result
-            System.out.println("Received recipes:");
-            System.out.println(recipesJson);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (shareList.isEmpty()) {
+            System.out.println("No ingredients found for christine.");
+        } else {
+            String recipes = RecipeGenerator.generateRecipesFromShareList(shareList);
+            System.out.println(recipes);
         }
-                before((req, res) -> res.header("Access-Control-Allow-Origin", "*"));
-                ShareListController.initializeRoutes();
-        }
+    }
 }
