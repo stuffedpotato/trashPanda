@@ -73,6 +73,25 @@
     </div>
   </div>
 
+  <div id="createPostModal2" class="modal hidden">
+    <div class="modal-content2">
+      <h2>Create New Post</h2>
+      <form id="postForm2">
+        <label for="foodName">Food Name:</label>
+        <input type="text" id="foodName2" name="foodName" required><br><br>
+  
+        <label for="expiryDate">Expiry Date:</label>
+        <input type="date" id="expiryDate2" name="expiryDate" required><br><br>
+  
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity2" name="quantity" min="1" required><br><br>
+  
+        <button type="submit" class="modalBtn2">Submit</button>
+        <button type="button" class="modalBtn close-modal2">Cancel</button>
+      </form>
+    </div>
+  </div>
+
     <script>
         async function getShareList() {
             const username = localStorage.getItem('username');
@@ -176,6 +195,67 @@
         userList.appendChild(newListItem);
         modal.classList.add('hidden');
         });
+
+        const createPostButton2 = document.querySelector('.createPostButton2');
+        const modal2 = document.querySelector('#createPostModal2');
+        const closeModalButtons2 = document.querySelectorAll('.close-modal2');
+
+        // Show modal when "Create new post" button is clicked
+        createPostButton2.addEventListener('click', () => {
+        modal2.classList.remove('hidden');
+        });
+
+        // Hide modal when "Cancel" button or outside modal is clicked
+        closeModalButtons2.forEach(button => {
+        button.addEventListener('click', () => {  // Change this line to use button instead of createPostButton
+            modal2.classList.add('hidden');
+        });
+        });
+
+        // Prevent form from refreshing the page on submit
+        document.getElementById('postForm2').addEventListener('submit2', (e2) => {
+        e2.preventDefault();
+        // alert("New post created!"); // Handle form submission here'
+        // const foodName = document.getElementById("foodName");
+        // const food = foodName.value;
+        // const expiryDate = document.getElementById("expiryDate").value;
+        // const date = expiryDate.value;
+        // const quantity = document.getElementById("quantity").value;
+        // const quant = quantity.value;
+        // const newListItem = document.createElement('li');
+        // newListItem.textContent = `${food}, ${date}, ${quant}`;
+
+ // Create a new list item with food details
+ const newListItem2 = document.createElement('li');
+    
+    // Create a sublist for each food entry with its details
+    const sublist2 = document.createElement('ul');
+
+    // Add list items for food name, expiry date, and quantity
+    const foodNameItem2 = document.createElement('li');
+    foodNameItem2.textContent = `${foodName2.value}`;
+    
+    const expiryDateItem2 = document.createElement('li');
+    expiryDateItem2.textContent = `Expiry Date: ${expiryDate2.value}`;
+
+    const quantityItem2 = document.createElement('li');
+    quantityItem2.textContent = `Amount: ${quantity2.value}`;
+
+    // Append the details to the sublist
+    sublist2.appendChild(foodNameItem2);
+    sublist2.appendChild(expiryDateItem2);
+    sublist2.appendChild(quantityItem2);
+
+    // Append the sublist to the new list item
+    newListItem2.appendChild(sublist2);
+
+        // Append the new list item to the list
+        userList2.appendChild(newListItem2);
+        modal2.classList.add('hidden');
+        });
+
+
+
 
 
 
