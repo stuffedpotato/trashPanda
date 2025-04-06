@@ -20,11 +20,25 @@
     </nav>
     <div class="container">
       <div class="section want">
-          <h2 style="color: #3E8440;">WANT</h2>
+          <!-- <h2 style="color: #3E8440;">WANT</h2> -->
+          <div id="infoText">
+            <h2 style="color: #3E8440;">WANT</h2>
+            <ul id="userList" style="margin-left: 10px;">
+              <!-- User entries will appear here -->
+            </ul>
+          </div>
+          <button class = "createPostButton">Create new entry</button>
       </div>
         <div class="section have">
-            <h2 style="color: #3E8440;">HAVE</h2>
-            <div id="share-list-results"></div>
+            <!-- <h2 style="color: #3E8440;">HAVE</h2> -->
+            <!-- <div id="share-list-results"></div> -->
+            <div id="infoText">
+              <h2 style="color: #3E8440;">HAVE</h2>
+              <ul id="userList2" style="margin-left: 10px;">
+                <!-- User entries will appear here -->
+              </ul>
+            </div>
+            <button class = "createPostButton2">Create new entry</button>
         </div>
       <!-- <button class="btn find-recipes">Find Recipes!</button>
       <button class="btn find-matches">Find Matches!</button> -->
@@ -38,6 +52,26 @@
         <button class="btn find-matches">Find Matches!</button>
     </div>
 </div>
+<!-- <button class = "createPostButton">Create new entry</button> -->
+
+<div id="createPostModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Create New Post</h2>
+      <form id="postForm">
+        <label for="foodName">Food Name:</label>
+        <input type="text" id="foodName" name="foodName" required><br><br>
+  
+        <label for="expiryDate">Expiry Date:</label>
+        <input type="date" id="expiryDate" name="expiryDate" required><br><br>
+  
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="1" required><br><br>
+  
+        <button type="submit" class="modalBtn">Submit</button>
+        <button type="button" class="modalBtn close-modal">Cancel</button>
+      </form>
+    </div>
+  </div>
 
     <script>
         async function getShareList() {
@@ -84,6 +118,67 @@
         }
 
         getShareList();
+
+        const createPostButton = document.querySelector('.createPostButton');
+        const modal = document.querySelector('#createPostModal');
+        const closeModalButtons = document.querySelectorAll('.close-modal');
+
+        // Show modal when "Create new post" button is clicked
+        createPostButton.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        });
+
+        // Hide modal when "Cancel" button or outside modal is clicked
+        closeModalButtons.forEach(button => {
+        button.addEventListener('click', () => {  // Change this line to use button instead of createPostButton
+            modal.classList.add('hidden');
+        });
+        });
+
+        // Prevent form from refreshing the page on submit
+        document.getElementById('postForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        // alert("New post created!"); // Handle form submission here'
+        // const foodName = document.getElementById("foodName");
+        // const food = foodName.value;
+        // const expiryDate = document.getElementById("expiryDate").value;
+        // const date = expiryDate.value;
+        // const quantity = document.getElementById("quantity").value;
+        // const quant = quantity.value;
+        // const newListItem = document.createElement('li');
+        // newListItem.textContent = `${food}, ${date}, ${quant}`;
+
+ // Create a new list item with food details
+ const newListItem = document.createElement('li');
+    
+    // Create a sublist for each food entry with its details
+    const sublist = document.createElement('ul');
+
+    // Add list items for food name, expiry date, and quantity
+    const foodNameItem = document.createElement('li');
+    foodNameItem.textContent = `${foodName.value}`;
+    
+    const expiryDateItem = document.createElement('li');
+    expiryDateItem.textContent = `Expiry Date: ${expiryDate.value}`;
+
+    const quantityItem = document.createElement('li');
+    quantityItem.textContent = `Amount: ${quantity.value}`;
+
+    // Append the details to the sublist
+    sublist.appendChild(foodNameItem);
+    sublist.appendChild(expiryDateItem);
+    sublist.appendChild(quantityItem);
+
+    // Append the sublist to the new list item
+    newListItem.appendChild(sublist);
+
+        // Append the new list item to the list
+        userList.appendChild(newListItem);
+        modal.classList.add('hidden');
+        });
+
+
+
     </script>
 
 
