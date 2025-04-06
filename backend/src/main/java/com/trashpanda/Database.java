@@ -8,14 +8,14 @@ import java.util.stream.Collectors;
 //java -cp ".;C:\Users\chris\Downloads\postgresql-42.7.5.jar" Database
 
 public class Database {
-    public static void main(String[] args) {
+
+    public static void initializeDatabase() {
         String url = "jdbc:postgresql://localhost:5432/postgres";
         String user = "postgres";
         String password = "password";
 
         try (Connection conn = DriverManager.getConnection(url, user, password)) {
-
-            String sql = Files.lines(Paths.get("sql/init.sql"))
+            String sql = Files.lines(Paths.get("src/main/java/com/trashpanda/sql/init.sql"))
                     .collect(Collectors.joining("\n"));
 
             for (String statement : sql.split(";")) {
@@ -31,5 +31,9 @@ public class Database {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        initializeDatabase();
     }
 }

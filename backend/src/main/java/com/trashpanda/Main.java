@@ -7,7 +7,8 @@ import static spark.Spark.*;
 
 public class Main {
         public static void main(String[] args) {
-                port(4567);
+            Database.initializeDatabase();
+            port(4567);
         try {
             // 🔸 1. Create sample share list
             Item tomato = new Item("tomatoes", ItemCategory.VEGETABLE, ItemQuantityType.COUNT);

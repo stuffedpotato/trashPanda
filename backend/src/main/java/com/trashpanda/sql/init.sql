@@ -38,6 +38,10 @@ CREATE TABLE sharelist
 INSERT INTO sharelist (username, ingredient, quantity, units, expiration_date)
 VALUES
     ('christine', 'sugar', 1, 'tsp', '2025-06-01'),
+('christine', 'spinach', 4, 'cups', '2025-05-15'),
+('christine', 'rice', 500, 'g', '2025-07-01'),
+('christine', 'olive oil', 1, 'L', '2025-08-10'),
+('christine', 'bread', 8, 'slices', '2025-04-25'),
 ('avi', 'spinach', 4, 'cups', '2025-05-15'),
 ('piyusha', 'rice', 500, 'g', '2025-07-01'),
 ('harper', 'olive oil', 1, 'L', '2025-08-10'),
