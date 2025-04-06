@@ -1,3 +1,5 @@
+package com.trashpanda;
+
 /*
  * Enum for quantity types.
  */
