@@ -1,10 +1,5 @@
 package com.trashpanda;
 
-public class Matchmaker {
-
-}
-package com.trashpanda;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

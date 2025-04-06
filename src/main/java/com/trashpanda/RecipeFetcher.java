@@ -1,5 +1,5 @@
 package com.trashpanda;
-
+import com.trashpanda.ShareList.ShareListEntry;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class RecipeFetcher {
     static {
         loadEnv(".env");
         API_KEY = System.getProperty("SPOONACULAR_API_KEY");
-        
+
         if (API_KEY == null) {
             throw new RuntimeException("SPOONACULAR_API_KEY not found in .env file");
         }

@@ -1,15 +1,22 @@
 package com.trashpanda;
 
 public class WantListEntry {
+    private String userName;
     private Item item;
     private double qty;
 
-    public WantListEntry(Item item, double qty) {
+    public WantListEntry(String userName, Item item, double qty) {
+        this.userName = userName;
         this.item = item;
         this.qty = qty;
     }
 
-    // Getters
+    // GETTERS
+
+    public String getUsername() {
+        return userName;
+    }
+
     public Item getItem() {
         return item;
     }

@@ -1,7 +1,6 @@
 package com.trashpanda;
-
+import com.trashpanda.ShareList.ShareListEntry;
 import java.util.Arrays;
-import java.util.Optional;
 import com.trashpanda.ShareList.ShareListController;
 
 import static spark.Spark.*;
@@ -14,8 +13,8 @@ public class Main {
             Item tomato = new Item("tomatoes", ItemCategory.VEGETABLE, ItemQuantityType.COUNT);
             Item rice = new Item("rice", ItemCategory.GRAIN, ItemQuantityType.CUP);
 
-            ShareListEntry e1 = new ShareListEntry(tomato, 3, Optional.empty());
-            ShareListEntry e2 = new ShareListEntry(rice, 1, Optional.empty());
+            ShareListEntry e1 = new ShareListEntry("piyusha", tomato, 3, null);
+            ShareListEntry e2 = new ShareListEntry("christine", rice, 1, null);
 
             // 🔸 2. Call the fetcher
             String recipesJson = RecipeFetcher.getRecipesFromShareList(Arrays.asList(e1, e2));

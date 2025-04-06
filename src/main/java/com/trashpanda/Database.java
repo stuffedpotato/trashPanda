@@ -1,3 +1,5 @@
+package com.trashpanda;
+
 import java.nio.file.*;
 import java.sql.*;
 import java.util.stream.Collectors;

@@ -17,9 +17,11 @@ public class ShareListEntry {
     }
 
     // Getters
+    
     public String getUsername() {
         return username;
     }
+
     public Item getItem() {
         return item;
     }
