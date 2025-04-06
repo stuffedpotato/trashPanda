@@ -1,11 +1,13 @@
 package com.trashpanda;
-import java.util.Optional;
-import java.time.LocalDate;
+import com.trashpanda.ShareList.ShareListController;
+
+import static spark.Spark.*;
 
 public class Main {
         public static void main(String[] args) {
-//            Item item = new Item("paprika", ItemCategory.SPICES, ItemQuantityType.TBSP);
-//            ShareListService service = new ShareListService("christine", item, 1, Optional.of(LocalDate.of(2025, 6, 1)));
-//            service.insertShareListEntry();
+                port(4567);
+
+                before((req, res) -> res.header("Access-Control-Allow-Origin", "*"));
+                ShareListController.initializeRoutes();
         }
 }

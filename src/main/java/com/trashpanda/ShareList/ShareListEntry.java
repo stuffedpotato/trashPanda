@@ -1,7 +1,7 @@
-package com.trashpanda;
+package com.trashpanda.ShareList;
+import com.trashpanda.Item;
+
 import java.sql.Date;
-import java.time.LocalDate;
-import java.util.Optional;
 
 public class ShareListEntry {
     String username;

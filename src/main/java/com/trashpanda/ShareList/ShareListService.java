@@ -1,4 +1,7 @@
-package com.trashpanda;
+package com.trashpanda.ShareList;
+
+import com.trashpanda.DatabaseConfig;
+import com.trashpanda.Item;
 
 import java.sql.*;
 
