@@ -32,8 +32,20 @@ public class WantListController {
 
         post("/wantlist", (req, res) -> {
             String body = req.body();
+            System.out.println("Received WantList POST request body: " + body);
+            
             Gson gson = new Gson();
             WantListEntry wantListEntry = gson.fromJson(body, WantListEntry.class);
+            
+            // Debug log to check received data
+            System.out.println("Parsed username: " + wantListEntry.getUsername());
+            System.out.println("Parsed item name: " + (wantListEntry.getItem() != null ? wantListEntry.getItem().getName() : "null"));
+            System.out.println("Parsed quantity: " + wantListEntry.getQty());
+            
+            if (wantListEntry.getUsername() == null || wantListEntry.getUsername().isEmpty()) {
+                res.status(400);
+                return "Username cannot be null or empty";
+            }
 
             WantListService wantListService = new WantListService();
             boolean success = wantListService.insertWantListEntry(

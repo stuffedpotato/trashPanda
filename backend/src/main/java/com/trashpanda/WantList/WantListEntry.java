@@ -3,12 +3,12 @@ package com.trashpanda.WantList;
 import com.trashpanda.Item;
 
 public class WantListEntry {
-    private String userName;
+    private String username;
     private Item item;
     private double qty;
 
-    public WantListEntry(String userName, Item item, double qty) {
-        this.userName = userName;
+    public WantListEntry(String username, Item item, double qty) {
+        this.username = username;
         this.item = item;
         this.qty = qty;
     }
@@ -16,7 +16,7 @@ public class WantListEntry {
     // GETTERS
 
     public String getUsername() {
-        return userName;
+        return username;
     }
 
     public Item getItem() {

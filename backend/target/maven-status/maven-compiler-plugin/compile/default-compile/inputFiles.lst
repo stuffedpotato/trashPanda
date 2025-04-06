@@ -13,4 +13,6 @@
 /Users/piyushasatija/Desktop/UBC/trashPanda/backend/src/main/java/com/trashpanda/ShareList/ShareListEntry.java
 /Users/piyushasatija/Desktop/UBC/trashPanda/backend/src/main/java/com/trashpanda/ShareList/ShareListService.java
 /Users/piyushasatija/Desktop/UBC/trashPanda/backend/src/main/java/com/trashpanda/User.java
-/Users/piyushasatija/Desktop/UBC/trashPanda/backend/src/main/java/com/trashpanda/WantListEntry.java
+/Users/piyushasatija/Desktop/UBC/trashPanda/backend/src/main/java/com/trashpanda/WantList/WantListController.java
+/Users/piyushasatija/Desktop/UBC/trashPanda/backend/src/main/java/com/trashpanda/WantList/WantListEntry.java
+/Users/piyushasatija/Desktop/UBC/trashPanda/backend/src/main/java/com/trashpanda/WantList/WantListService.java

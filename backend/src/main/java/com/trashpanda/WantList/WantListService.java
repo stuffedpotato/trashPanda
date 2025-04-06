@@ -47,18 +47,23 @@ public class WantListService {
     public boolean insertWantListEntry(String username, Item item, double qty) {
         String sql = "INSERT INTO wantlist (username, ingredient, quantity, units) " +
                 "VALUES (?, ?, ?, ?)";
-
+        
+        System.out.println("Executing SQL: " + sql);
+        System.out.println("With parameters: username=" + username + ", ingredient=" + item.getName() + 
+                           ", quantity=" + qty + ", units=" + item.getQtyType().name());
+    
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+    
             stmt.setString(1, username);
             stmt.setString(2, item.getName());
             stmt.setDouble(3, qty);
             stmt.setString(4, item.getQtyType().name());
-
+    
             int rowsAffected = stmt.executeUpdate();
+            System.out.println("Rows affected: " + rowsAffected);
             return rowsAffected > 0;
-
+    
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
