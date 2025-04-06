@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS usercommunities;
-DROP TABLE IF EXISTS communities;
+-- DROP TABLE IF EXISTS usercommunities;
+-- DROP TABLE IF EXISTS communities;
 DROP TABLE IF EXISTS sharelist;
 DROP TABLE IF EXISTS wantlist;
 DROP TABLE IF EXISTS profiles;
@@ -61,34 +61,34 @@ VALUES
 ('harper', 'olive oil', 1, 'L'),
 ('charity', 'bread', 8, 'slices');
 
-CREATE TABLE communities
-(
-    communityname VARCHAR(100) PRIMARY KEY,
-    description TEXT
-);
-
-INSERT INTO communities (communityname, description)
-VALUES
-    ('UBC Garden Club', 'A community for gardening enthusiasts to share fresh produce.'),
-('test2', 'description2'),
-('test3', 'description3'),
-('test4', 'description4'),
-('test5', 'description5');
-
-
-CREATE TABLE usercommunities
-(
-    communityname VARCHAR(100),
-    username      VARCHAR(100),
-    PRIMARY KEY (communityname, username),
-    CONSTRAINT fk_uc_community FOREIGN KEY (communityname) REFERENCES communities(communityname) ON DELETE CASCADE,
-    CONSTRAINT fk_uc_user FOREIGN KEY (username) REFERENCES profiles(username) ON DELETE CASCADE
-);
-
-INSERT INTO usercommunities (communityname, username)
-VALUES
-    ('UBC Garden Club', 'christine'),
-('UBC Garden Club', 'avi'),
-('test2', 'piyusha'),
-('test3', 'harper'),
-('test3', 'charity');
+-- CREATE TABLE communities
+-- (
+--     communityname VARCHAR(100) PRIMARY KEY,
+--     description TEXT
+-- );
+--
+-- INSERT INTO communities (communityname, description)
+-- VALUES
+--     ('UBC Garden Club', 'A community for gardening enthusiasts to share fresh produce.'),
+-- ('test2', 'description2'),
+-- ('test3', 'description3'),
+-- ('test4', 'description4'),
+-- ('test5', 'description5');
+--
+--
+-- CREATE TABLE usercommunities
+-- (
+--     communityname VARCHAR(100),
+--     username      VARCHAR(100),
+--     PRIMARY KEY (communityname, username),
+--     CONSTRAINT fk_uc_community FOREIGN KEY (communityname) REFERENCES communities(communityname) ON DELETE CASCADE,
+--     CONSTRAINT fk_uc_user FOREIGN KEY (username) REFERENCES profiles(username) ON DELETE CASCADE
+-- );
+--
+-- INSERT INTO usercommunities (communityname, username)
+-- VALUES
+--     ('UBC Garden Club', 'christine'),
+-- ('UBC Garden Club', 'avi'),
+-- ('test2', 'piyusha'),
+-- ('test3', 'harper'),
+-- ('test3', 'charity');
