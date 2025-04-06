@@ -22,7 +22,7 @@ public class RecipeGenerator {
 
     public static String generateRecipesFromShareList(List<ShareListEntry> shareList) {
         System.out.println("Attempting to generate recipes with " + shareList.size() + " ingredients");
-        
+
         if (API_KEY == null || API_KEY.isEmpty()) {
             System.out.println("ERROR: GEMINI_API_KEY not found or empty");
             return "Error: GEMINI_API_KEY not set in environment variables.";
@@ -33,14 +33,17 @@ public class RecipeGenerator {
                 .collect(Collectors.joining(", "));
 
         String prompt = String.format(
-                "Using the following ingredients: %s, generate 2-3 creative and simple recipes.\n\n" +
-                        "For each recipe, provide:\n" +
-                        "1. Recipe title (on a line by itself)\n" +
-                        "2. A short 2-3 sentence summary\n" +
-                        "3. A section called 'Ingredients You Have:' that lists items from the provided list\n" +
-                        "4. A section called 'Additional Ingredients Needed:' that lists other ingredients\n\n" +
-                        "Format each recipe with clear section headers and separate each recipe with a line of dashes (----).\n" +
-                        "Avoid abbreviations (e.g., write 'tablespoons' not 'tbsp').",
+                "You are a recipe assistant helping users make meals from their available ingredients.\n\n" +
+                        "Using the following ingredients: %s\n\n" +
+                        "Generate exactly 3 well-structured recipes.\n" +
+                        "For each recipe, you MUST include:\n" +
+                        "1. A title on its own line\n" +
+                        "2. A short 2-3 sentence summary (this is required)\n" +
+                        "3. A section labeled 'Ingredients You Have:' with a bullet list\n" +
+                        "4. A section labeled 'Additional Ingredients Needed:' with a bullet list\n\n" +
+                        "Separate each recipe with a line of dashes like this: ----\n" +
+                        "Do NOT skip the summary. Ensure it's present and clearly written.\n" +
+                        "Avoid abbreviations (write 'tablespoons', not 'tbsp').",
                 ingredients);
 
         try {
@@ -78,7 +81,7 @@ public class RecipeGenerator {
             int responseCode = conn.getResponseCode();
             if (responseCode != 200) {
                 System.out.println("Error from Gemini API: Response code " + responseCode);
-                
+
                 // Read error message
                 StringBuilder errorResponse = new StringBuilder();
                 try (Scanner scanner = new Scanner(conn.getErrorStream())) {
@@ -87,7 +90,7 @@ public class RecipeGenerator {
                     }
                 }
                 System.out.println("Error details: " + errorResponse.toString());
-                
+
                 return "Failed to generate recipes. API response: " + responseCode;
             }
 
@@ -97,6 +100,10 @@ public class RecipeGenerator {
             while (scanner.hasNextLine()) {
                 response.append(scanner.nextLine());
             }
+
+            System.out.println("===== RAW GEMINI RESPONSE =====");
+            System.out.println(response.toString());
+            System.out.println("================================");
 
             return extractPlainTextRecipes(response.toString());
 
@@ -112,38 +119,38 @@ public class RecipeGenerator {
             // Parse the response JSON
             JsonObject jsonResponse = JsonParser.parseString(response).getAsJsonObject();
             JsonArray candidates = jsonResponse.getAsJsonArray("candidates");
-            
+
             if (candidates != null && candidates.size() > 0) {
                 JsonObject firstCandidate = candidates.get(0).getAsJsonObject();
                 JsonObject content = firstCandidate.getAsJsonObject("content");
                 JsonArray parts = content.getAsJsonArray("parts");
-                
+
                 if (parts != null && parts.size() > 0) {
                     // Extract the text content directly without trying to parse it as JSON
                     String recipeText = parts.get(0).getAsJsonObject().get("text").getAsString();
                     return formatRecipeText(recipeText);
                 }
             }
-            
+
             return "No recipes could be generated.";
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             return "Error extracting recipes: " + e.getMessage();
         }
     }
-    
+
     // Format recipe text for better display
     private static String formatRecipeText(String recipeText) {
         // Replace multiple newlines with a single newline to clean up spacing
         recipeText = recipeText.replaceAll("\\n{3,}", "\n\n");
-        
+
         // Ensure recipe separators are formatted consistently
         recipeText = recipeText.replaceAll("[-]{4,}", "\n\n----\n\n");
-        
+
         // Add HTML-friendly formatting (the frontend will handle this as HTML)
         recipeText = recipeText.replaceAll("\\n", "<br>");
-        
+
         return recipeText;
     }
 }
