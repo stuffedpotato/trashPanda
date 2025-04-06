@@ -27,8 +27,6 @@ public class RecipeGenerator {
             System.out.println("ERROR: GEMINI_API_KEY not found or empty");
             return "Error: GEMINI_API_KEY not set in environment variables.";
         }
-        
-        System.out.println("Using API key: " + API_KEY.substring(0, 4) + "...");
 
         String ingredients = shareList.stream()
                 .map(entry -> entry.getItem().getName())
@@ -99,8 +97,6 @@ public class RecipeGenerator {
             while (scanner.hasNextLine()) {
                 response.append(scanner.nextLine());
             }
-            
-            System.out.println("Received API response, length: " + response.length());
 
             return extractPlainTextRecipes(response.toString());
 
