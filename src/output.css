@@ -357,8 +357,16 @@ html, body {
     border: 1px solid #ccc;
     border-radius: 8px;
     background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed; /* Make the summary fixed on the page */
+    top: 30%;
   }
 
+  #summary p {
+    margin-bottom: 10px; /* Add some space between lines */
+  }
   .summary h2 {
     margin-top: 0;
   }
