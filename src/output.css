@@ -263,6 +263,17 @@ body {
   color:#3E8440
 }
 
+.createPostButton:hover {
+  width: 300px;
+  height: 100px;
+  margin: 10px;
+  border-radius: 10px;
+  background-color: #f2d5d2; /* Light green background */
+  border: none;
+  cursor: pointer;
+  color:#3E8440
+}
+
 .btn {
   width: 300px;
   height: 100px;
