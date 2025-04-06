@@ -171,6 +171,44 @@
       border-bottom: 1px solid rgba(62, 132, 64, 0.2);
     }
 
+    /* Match styles */
+    .match-item {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-left: 4px solid #3E8440;
+    }
+
+    .match-header {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #3E8440;
+    }
+
+    .match-details {
+      margin-left: 10px;
+    }
+
+    .match-details p {
+      margin: 5px 0;
+    }
+
+    .btn-contact {
+      background-color: #3E8440;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 12px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .btn-contact:hover {
+      background-color: #2a5c2d;
+    }
+
     /* Modal styles */
     .modal {
       display: none;
@@ -379,7 +417,6 @@
     <ul class="nav-links">
       <li><a href="index.html">PROFILE</a></li>
       <li><a href="home.html">HOME</a></li>
-      <li><a href="community.html">COMMUNITY</a></li>
     </ul>
   </nav>
 
@@ -604,34 +641,114 @@
       }
     });
 
-    function displayRecipes(recipes) {
+    function displayRecipes(recipeText) {
       const recipesContainer = document.getElementById("recipes-container");
       const recipesList = document.getElementById("recipes-list");
 
-      if (!recipes || recipes.length === 0) {
+      if (!recipeText || recipeText.includes("No recipes could be generated") || recipeText.includes("Failed to generate recipes")) {
         recipesList.innerHTML = "<p>No recipes found with your current ingredients.</p>";
         recipesContainer.classList.remove("hidden");
         return;
       }
 
+      // Split the recipes by the separator line
+      const recipes = recipeText.split("<br><br>----<br><br>");
+
+      // Create recipe cards for each recipe
       recipesList.innerHTML = recipes.map(recipe => {
+        // Clean up the recipe text
+        const cleanedRecipe = recipe.trim();
+
+        // Create a styled recipe card
         return `
-            <div class="recipe-card">
-              <h3>${recipe.title}</h3>
-              <p>${recipe.summary}</p>
-              <h4>Ingredients You Have:</h4>
-              <ul>
-                ${recipe.usedIngredients.map(ingredient => `<li>${ingredient}</li>`).join("")}
-              </ul>
-              <h4>Additional Ingredients Needed:</h4>
-              <ul>
-                ${recipe.neededIngredients.map(ingredient => `<li>${ingredient}</li>`).join("")}
-              </ul>
-            </div>
-          `;
+      <div class="recipe-card">
+        ${cleanedRecipe}
+      </div>
+    `;
       }).join("");
 
       recipesContainer.classList.remove("hidden");
+    }
+
+    // Also update the Find Recipes button handler to handle plain text:
+    document.querySelector(".find-recipes").addEventListener("click", async () => {
+      try {
+        document.querySelector(".find-recipes").innerHTML = "Finding Recipes... <span class='loading'></span>";
+
+        const response = await fetch(`${API_BASE_URL}/recipes/${username}`);
+
+        document.querySelector(".find-recipes").innerHTML = "Find Recipes!";
+
+        if (response.ok) {
+          const recipeText = await response.text(); // Changed from json() to text()
+          displayRecipes(recipeText);
+          showStatus("Recipes generated successfully!", true);
+        } else {
+          showStatus("Could not find recipes with your ingredients.", false);
+        }
+      } catch (error) {
+        console.error("Error finding recipes:", error);
+        document.querySelector(".find-recipes").innerHTML = "Find Recipes!";
+        showStatus("Error connecting to recipe service.", false);
+      }
+    });
+
+    // Function to display matches with contact information
+    function displayMatches(matches) {
+      const matchResultsElement = document.getElementById("matchResults");
+
+      if (matches.length === 0) {
+        matchResultsElement.innerHTML = "<li>No matches found in your area.</li>";
+        return;
+      }
+
+      // Create a more detailed display with contact information
+      matchResultsElement.innerHTML = matches.map(match => {
+        const userName = match.user.firstName || match.user.userName;
+        const distance = match.distance.toFixed(1);
+        const contact = match.user.contact || "No contact information available";
+
+        // List what they have and you want
+        const theirShareItems = match.user.shareList ? match.user.shareList.map(item => {
+          const itemName = item.item ? item.item.name : "Unknown item";
+          const qty = item.qty || 0;
+          const unit = (item.item && item.item.qtyType) ? item.item.qtyType.toLowerCase() : "units";
+          return `${itemName} (${qty} ${unit})`;
+        }).join(", ") : "No items shared";
+
+        // Return the HTML for this match
+        return `
+          <li class="match-item">
+            <div class="match-header">
+              <strong>${userName}</strong> (${distance} km away)
+            </div>
+            <div class="match-details">
+              <p><strong>Contact:</strong> ${contact}</p>
+              <p><strong>They have:</strong> ${theirShareItems}</p>
+              <button class="btn-contact" onclick="contactMatch('${userName}', '${contact}')">
+                Contact ${userName}
+              </button>
+            </div>
+          </li>
+        `;
+      }).join("");
+    }
+
+    // Helper function to handle contacting a match
+    function contactMatch(userName, contact) {
+      // In a real app, this could open a chat interface or email form
+      // For now, we'll just copy their contact info to clipboard and show an alert
+      try {
+        navigator.clipboard.writeText(contact).then(() => {
+          showStatus(`Contact info for ${userName} copied to clipboard!`, true);
+        }).catch(err => {
+          console.error('Failed to copy contact info:', err);
+          showStatus(`Contact ${userName} at: ${contact}`, true);
+        });
+      } catch (e) {
+        // Fallback for browsers that don't support clipboard API
+        showStatus(`Contact ${userName} at: ${contact}`, true);
+      }
     }
 
     // Find Matches button handler
@@ -641,21 +758,16 @@
         document.getElementById("matchResults").innerHTML = "<li>Searching for matches...</li>";
 
         const response = await fetch(`${API_BASE_URL}/matches/${username}`);
-
         document.querySelector(".find-matches").innerHTML = "Find Matches!";
 
         if (response.ok) {
           const matches = await response.json();
+          displayMatches(matches);
 
-          // Display matches in the UI
-          const matchResultsElement = document.getElementById("matchResults");
-          if (matches.length === 0) {
-            matchResultsElement.innerHTML = "<li>No matches found in your area.</li>";
-          } else {
-            matchResultsElement.innerHTML = matches.map(m =>
-              `<li>${m.user.firstName || m.user.userName} (${m.distance.toFixed(1)} km away)</li>`
-            ).join("");
+          if (matches.length > 0) {
             showStatus("Found matches in your area!", true);
+          } else {
+            showStatus("No matches found in your area.", false);
           }
         } else {
           document.getElementById("matchResults").innerHTML = "<li>No matches found in your area.</li>";
@@ -732,7 +844,7 @@
       }
     });
 
-    // Handle share list form submission - similarly updated
+    // Handle share list form submission
     document.getElementById("postForm2").addEventListener("submit", async (e) => {
       e.preventDefault();
       const item = document.getElementById("foodName2").value;
