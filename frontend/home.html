@@ -430,6 +430,15 @@
         font-size: 16px;
       }
     }
+
+    .delete-button-share {
+      background: none;
+      border: none;
+    }
+    .delete-button-want {
+      background: none;
+      border: none;
+    }
   </style>
 </head>
 
@@ -551,6 +560,17 @@
     </div>
   </div>
 
+  <div id="delete-modal" class="modal">
+    <div class="modal-content">
+      <h2>Are you sure you want to delete this item?</h2>
+      <p id="modal-item-name"></p>
+      <div class="buttons-container">
+        <button id="confirm-delete" class="modalBtn">Yes</button>
+        <button id="cancel-delete" class="close-modal modalBtn">No</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Get the current username from localStorage
     const username = localStorage.getItem("username") || "christine";
@@ -596,24 +616,6 @@
       }
     }
 
-    function displayShareList(shareList) {
-      const shareListElement = document.getElementById("userList2");
-
-      if (!shareList || shareList.length === 0) {
-        shareListElement.innerHTML = "<li>No items in your share list</li>";
-        return;
-      }
-
-      shareListElement.innerHTML = shareList.map(item => {
-        const itemName = item.item ? item.item.name : "Unknown item";
-        const qty = item.qty || 0;
-        const unit = (item.item && item.item.qtyType) ? item.item.qtyType.toLowerCase() : "units";
-        const date = item.expirationDate ? new Date(item.expirationDate).toLocaleDateString() : "No expiry";
-
-        return `<li>${itemName} - ${qty} ${unit} (Expires: ${date})</li>`;
-      }).join("");
-    }
-
     function displayWantList(wantList) {
       const wantListElement = document.getElementById("userList");
 
@@ -627,9 +629,63 @@
         const qty = item.qty || 1;
         const unit = (item.item && item.item.qtyType) ? item.item.qtyType.toLowerCase() : "units";
 
-        return `<li>${itemName} - ${qty} ${unit}</li>`;
+        return `<li>${itemName} - ${qty} ${unit}
+    <button class="delete-button-want" data-item-name1="${item.item.name}">&#x274c;</button>
+    </li>`;
       }).join("");
+
+    const deleteButtons = document.querySelectorAll('.delete-button-want');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const itemName = e.target.getAttribute('data-item-name1');
+        const modal = document.getElementById('delete-modal');
+        const modalItemName = document.getElementById('modal-item-name');
+        const confirmDeleteButton = document.getElementById('confirm-delete');
+        const cancelDeleteButton = document.getElementById('cancel-delete');
+
+        modalItemName.textContent = `Are you sure you want to delete ${itemName}?`;
+
+        modal.classList.add('visible');
+
+        confirmDeleteButton.onclick = async () => {
+          try {
+            const response = await fetch(`${API_BASE_URL}/wantlist`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                username: username,
+                item: { name: itemName },
+              }),
+            });
+
+            if (response.ok) {
+              console.log(`${itemName} deleted successfully.`);
+              e.target.closest('li').remove();
+            } else {
+              console.log(`Error deleting ${itemName}`);
+            }
+          } catch (error) {
+            console.error('Error:', error);
+          }
+          modal.classList.remove('visible');
+        };
+
+        cancelDeleteButton.onclick = () => {
+          modal.classList.remove('visible');
+        };
+      });
+    });
     }
+
+    function displayShareList(shareList) {
+      const shareListElement = document.getElementById("userList2");
+
+      if (!shareList || shareList.length === 0) {
+        shareListElement.innerHTML = "<li>No items in your share list</li>";
+        return;
+      }
 
     function showStatus(message, isSuccess) {
       const statusContainer = document.getElementById("status-container");
@@ -931,6 +987,63 @@
         showStatus("Error connecting to the server", false);
       }
     });
+
+      shareListElement.innerHTML = shareList.map(item => {
+        const itemName = item.item ? item.item.name : "Unknown item";
+        const qty = item.qty || 0;
+        const unit = (item.item && item.item.qtyType) ? item.item.qtyType.toLowerCase() : "units";
+        const date = item.expirationDate ? new Date(item.expirationDate).toLocaleDateString() : "No expiry";
+
+        return `<li>${itemName} - ${qty} ${unit} (Expires: ${date})
+    <button class="delete-button-share" data-item-name="${item.item.name}">&#x274c;</button>
+  </li>`;
+      }).join("");
+
+      const deleteButtons = document.querySelectorAll('.delete-button-share');
+      deleteButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          const itemName = e.target.getAttribute('data-item-name');
+          const modal = document.getElementById('delete-modal');
+          const modalItemName = document.getElementById('modal-item-name');
+          const confirmDeleteButton = document.getElementById('confirm-delete');
+          const cancelDeleteButton = document.getElementById('cancel-delete');
+
+          modalItemName.textContent = `Are you sure you want to delete ${itemName}?`;
+
+          modal.classList.add('visible');
+
+          confirmDeleteButton.onclick = async () => {
+            try {
+              const response = await fetch(`${API_BASE_URL}/sharelist`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  username: username,
+                  item: { name: itemName },
+                }),
+              });
+
+              if (response.ok) {
+                console.log(`${itemName} deleted successfully.`);
+                e.target.closest('li').remove();
+              } else {
+                console.log(`Error deleting ${itemName}`);
+              }
+            } catch (error) {
+              console.error('Error:', error);
+            }
+            // Close the modal after the action
+            modal.classList.remove('visible');
+          };
+
+          cancelDeleteButton.onclick = () => {
+            modal.classList.remove('visible');
+          };
+        });
+      });
+      }
   </script>
 </body>
 
