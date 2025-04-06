@@ -1,3 +1,5 @@
+# Trash Panda
+
 ## Inspiration
 We were inspired by the amazing work that [FoodStash](https://www.foodstash.ca) does at a large scale — rescuing over **130,000+ pounds of food per month** from grocery stores, restaurants, and farms. While their impact is incredible, we wanted to build something that helps everyday people take action *locally*.
 
